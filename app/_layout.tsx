@@ -114,14 +114,7 @@ function RootLayoutNav() {
         const hasToken = await pushNotificationService.hasToken();
         
         if (!hasToken) {
-          const token = await pushNotificationService.registerForPushNotifications();
-          if (token) {
-            console.log('Push token registration completed');
-          } else {
-            console.log('Push token registration failed');
-          }
-        } else {
-          console.log('Push token already exists, skipping registration');
+          await pushNotificationService.registerForPushNotifications();
         }
       } else {
         pushNotificationService.clearToken();

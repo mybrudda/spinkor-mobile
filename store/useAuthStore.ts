@@ -60,7 +60,7 @@ export const useAuthStore = create<AuthState>((set, get) => ({
       set({ loading: true })
       
       // Call the edge function for user registration
-      const response = await fetch('https://bcgaxusnquwhslrgyaxk.supabase.co/functions/v1/register-new-user', {
+      const response = await fetch(`${process.env.EXPO_PUBLIC_SUPABASE_URL}/functions/v1/register-new-user`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -95,7 +95,7 @@ export const useAuthStore = create<AuthState>((set, get) => ({
       set({ loading: true })
       
       // Call the edge function for password reset
-      const response = await fetch('https://bcgaxusnquwhslrgyaxk.supabase.co/functions/v1/password-reset', {
+      const response = await fetch(`${process.env.EXPO_PUBLIC_SUPABASE_URL}/functions/v1/password-reset`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

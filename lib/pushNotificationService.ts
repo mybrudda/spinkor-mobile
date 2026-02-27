@@ -49,11 +49,9 @@ export class PushNotificationService {
       const storedToken = await this.getStoredToken();
       if (storedToken) {
         this.expoPushToken = storedToken;
-        console.log('Loaded existing push token from storage');
       }
 
       this.isInitialized = true;
-      console.log('Push notification service initialized');
     } catch (error) {
       console.error('Error initializing push notification service:', error);
     }
@@ -116,13 +114,11 @@ export class PushNotificationService {
       const storedToken = await this.getStoredToken();
       if (storedToken) {
         this.expoPushToken = storedToken;
-        console.log('Push token already exists, skipping registration');
         return this.expoPushToken;
       }
 
       // Check if device supports push notifications
       if (!Device.isDevice) {
-        console.log('Push notifications are only supported on physical devices');
         return null;
       }
 
@@ -147,7 +143,6 @@ export class PushNotificationService {
       }
       
       if (finalStatus !== 'granted') {
-        console.log('Permission not granted for push notifications');
         return null;
       }
 
@@ -164,7 +159,6 @@ export class PushNotificationService {
       });
 
       this.expoPushToken = token;
-      console.log('Push token generated:', this.expoPushToken);
 
       // Store token locally
       await this.storeToken(this.expoPushToken);
@@ -184,13 +178,10 @@ export class PushNotificationService {
    */
   setupNotificationListeners(): void {
     // Handle notifications received while app is in foreground
-    Notifications.addNotificationReceivedListener(notification => {
-      console.log('Notification received:', notification);
-    });
+    Notifications.addNotificationReceivedListener(_notification => {});
 
     // Handle notification responses (when user taps on notification)
     Notifications.addNotificationResponseReceivedListener(response => {
-      console.log('Notification response:', response);
       this.handleNotificationResponse(response);
     });
   }
@@ -203,13 +194,11 @@ export class PushNotificationService {
     
     switch (data.type) {
       case 'message':
-        console.log('Navigate to message from:', data.senderId);
+        // TODO (C-5): navigate to ChatRoom with data.conversationId
         break;
       case 'post':
-        console.log('Navigate to post:', data.postId);
+        // TODO (C-5): navigate to PostDetails with data.postId
         break;
-      default:
-        console.log('Unknown notification type:', data.type);
     }
   }
 
@@ -232,7 +221,6 @@ export class PushNotificationService {
       });
 
       if (checkError || !shouldSend) {
-        console.log('Notification blocked by user settings');
         return false;
       }
 
@@ -242,7 +230,6 @@ export class PushNotificationService {
       });
 
       if (tokensError || !tokens || tokens.length === 0) {
-        console.log('No push tokens found for user:', recipientUserId);
         return false;
       }
 
@@ -258,9 +245,6 @@ export class PushNotificationService {
         },
       }));
 
-      console.log('Sending notifications with sound:', 'notification.mp3');
-      console.log('Messages to send:', messages);
-
       // Send notifications
       const response = await fetch('https://exp.host/--/api/v2/push/send', {
         method: 'POST',
@@ -275,7 +259,6 @@ export class PushNotificationService {
       const result = await response.json();
       
       if (response.ok) {
-        console.log('Push notification sent successfully');
         return true;
       } else {
         console.error('Failed to send push notification:', result);
@@ -336,7 +319,6 @@ export class PushNotificationService {
     try {
       this.expoPushToken = null;
       await AsyncStorage.removeItem(PUSH_TOKEN_KEY);
-      console.log('Push token cleared');
     } catch (error) {
       console.error('Error clearing push token:', error);
     }

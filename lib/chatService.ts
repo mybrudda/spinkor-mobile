@@ -192,8 +192,6 @@ export const chatService = {
         const { data: currentUser } = await supabase.auth.getUser();
         if (!currentUser.user) throw new Error('Not authenticated');
 
-        console.log('Current user ID:', currentUser.user.id);
-
         // Get the conversation to check user's role
         const { data: conversation, error: convError } = await supabase
             .from('conversations')
@@ -204,19 +202,9 @@ export const chatService = {
         if (convError) throw convError;
         if (!conversation) throw new Error('Conversation not found');
 
-        console.log('Conversation details:', {
-            conversationId,
-            creatorId: conversation.creator_id,
-            participantId: conversation.participant_id,
-            deletedByCreator: conversation.deleted_by_creator,
-            deletedByParticipant: conversation.deleted_by_participant
-        });
-
         // Check if user is creator or participant
         const isCreator = currentUser.user.id === conversation.creator_id;
         const isParticipant = currentUser.user.id === conversation.participant_id;
-
-        console.log('Role check:', { isCreator, isParticipant });
 
         if (!isCreator && !isParticipant) {
             throw new Error('User is not part of this conversation');
@@ -227,13 +215,9 @@ export const chatService = {
         
         if (isCreator) {
             updateData.deleted_by_creator = true;
-            console.log('User is creator, updating deleted_by_creator');
         } else {
             updateData.deleted_by_participant = true;
-            console.log('User is participant, updating deleted_by_participant');
         }
-
-        console.log('Update data:', updateData);
 
         // Update the conversation
         const { data: updatedConversation, error } = await supabase
@@ -247,7 +231,5 @@ export const chatService = {
             console.error('Error updating conversation:', error);
             throw error;
         }
-
-        console.log('Updated conversation:', updatedConversation);
     }
 }; 

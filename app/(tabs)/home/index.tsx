@@ -367,7 +367,6 @@ export default function Home() {
 
   // Initial load - fetch all posts without filters
   useEffect(() => { // useEffect will run twice on initial load due to REACT sctrict mode
-  console.log('Mounted Home Screen')
     let mounted = true;
 
     const loadInitialData = async () => {
