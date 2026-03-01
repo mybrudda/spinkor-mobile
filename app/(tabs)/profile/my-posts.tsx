@@ -9,8 +9,7 @@ import PostCard from "../../../components/posts/PostCard";
 import { Post } from "../../../types/database";
 import LoadingScreen from "../../../components/ui/LoadingScreen";
 import Header from "../../../components/layout/Header";
-
-const POSTS_PER_PAGE = 10;
+import { POSTS_PER_PAGE } from "../../../constants/pagination";
 
 export default function MyPostsScreen() {
   const [userPosts, setUserPosts] = useState<Post[]>([]);

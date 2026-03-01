@@ -16,8 +16,7 @@ import ReportPostModal from '../components/ReportPostModal';
 import { getCloudinaryUrl } from '../lib/cloudinary';
 import ProfileImage from '../components/ui/ProfileImage';
 import LoginRequiredModal from '../components/auth/LoginRequiredModal';
-
-const blurhash = 'L6PZfSi_.AyE_3t7t7R**0o#DgR4';
+import { PLACEHOLDER_BLURHASH } from '../constants/images';
 
 // Move DetailItem component outside to prevent hook recreation
 const DetailItem = ({ label, value }: { label: string; value: string }) => {
@@ -81,7 +80,7 @@ export default function PostDetails() {
         style={styles.carouselImage}
         contentFit="cover"
         transition={300}
-        placeholder={blurhash}
+        placeholder={PLACEHOLDER_BLURHASH}
         cachePolicy="memory-disk"
         onError={() => setImageError(true)}
       />

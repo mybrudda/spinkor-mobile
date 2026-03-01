@@ -49,8 +49,8 @@ These items are **Trivial** or **Easy** to fix but have a meaningful impact. The
 | ~~O-7~~ | ~~Create a `.env.example` file~~ | ~~Optional~~ | ~~**Trivial**~~ | ✅ Done |
 | ~~R-7~~ | ~~Rename `FormOptions.tsx` → `FormOptions.ts`~~ | ~~Recommended~~ | ~~**Trivial**~~ | ✅ Done |
 | ~~R-9~~ | ~~Remove debug `console.log` statements~~ | ~~Recommended~~ | ~~**Trivial**~~ | ✅ Done |
-| R-1 | Extract `blurhash` to a shared constant | Recommended | **Easy** |
-| R-2 | Extract `POSTS_PER_PAGE` to a shared constant | Recommended | **Easy** |
+| ~~R-1~~ | ~~Extract `blurhash` to a shared constant~~ | ~~Recommended~~ | ~~**Easy**~~ | ✅ Done |
+| ~~R-2~~ | ~~Extract `POSTS_PER_PAGE` to a shared constant~~ | ~~Recommended~~ | ~~**Easy**~~ | ✅ Done |
 | O-3 | Type the NHTSA API response in `useVehicleModels` | Optional | **Easy** |
 | O-2 | Replace `useRef<any>` for reCAPTCHA with a proper type | Optional | **Easy** |
 | I-3 | Replace `useState<any>` for `currentUser` in `ChatRoom` | Important | **Easy** |
@@ -287,29 +287,19 @@ Any bug fix or behaviour change (e.g., changing image resize dimensions, changin
 
 ---
 
-### R-1 · `blurhash` Constant Copy-Pasted Across Four Files
+### ~~R-1 · `blurhash` Constant Copy-Pasted Across Four Files~~ ✅ Done
 
-**Priority:** Recommended · **Effort:** Easy
+**Priority:** Recommended · **Effort:** Easy · **Status: Completed March 2, 2026**
 
-**File(s):** `app/ChatRoom.tsx`, `app/PostDetails.tsx`, `components/posts/PostCard.tsx`, `components/chat/ConversationList.tsx`  
-**Why it matters:** The string `"L6PZfSi_.AyE_3t7t7R**0o#DgR4"` is defined as a local `const` in at least four separate files. If the placeholder image changes and a new blurhash is needed, all four files must be updated. A single missed update will show a mismatched blur placeholder.
-
-**Impact of fixing:** One change updates all image placeholders. Eliminates a class of copy-paste inconsistency.
-
-**Why Easy:** Add `export const PLACEHOLDER_BLURHASH = "L6PZfSi_.AyE_3t7t7R**0o#DgR4"` to `constants/theme.ts` (or a new `constants/images.ts`), then replace the four local definitions with an import. Mechanical find-and-replace across 4 files.
+`PLACEHOLDER_BLURHASH` has been extracted to `constants/images.ts`. All five files (`app/ChatRoom.tsx`, `app/PostDetails.tsx`, `components/posts/PostCard.tsx`, `components/chat/ConversationList.tsx`, `components/forms/ImagePickerSection.tsx`) now import it from there instead of defining a local constant.
 
 ---
 
-### R-2 · `POSTS_PER_PAGE` Constant Redefined in Multiple Files
+### ~~R-2 · `POSTS_PER_PAGE` Constant Redefined in Multiple Files~~ ✅ Done
 
-**Priority:** Recommended · **Effort:** Easy
+**Priority:** Recommended · **Effort:** Easy · **Status: Completed March 2, 2026**
 
-**File(s):** `app/(tabs)/home/index.tsx`, `app/(tabs)/profile/my-posts.tsx`  
-**Why it matters:** The pagination page size is defined as a local constant in each file that uses it. If the page size needs to change (e.g., for performance tuning), it must be updated in every file independently. A mismatch between files means different screens paginate at different rates, which can cause confusing UX (e.g., "My Posts" loads 10 at a time but the home feed loads 20).
-
-**Impact of fixing:** One change updates pagination behaviour across all screens. Makes pagination behaviour consistent and easy to tune.
-
-**Why Easy:** Move `POSTS_PER_PAGE` to `constants/` and import it in the two files that use it. A 5-minute mechanical change.
+`POSTS_PER_PAGE` has been extracted to `constants/pagination.ts`. Both `app/(tabs)/home/index.tsx` and `app/(tabs)/profile/my-posts.tsx` now import it from there instead of defining a local constant.
 
 ---
 
@@ -543,8 +533,8 @@ Silent failures are among the hardest bugs to diagnose because users report "it 
 | I-6 | `getItemLayout` uses incorrect fixed height for chat messages | **Important** | Easy | Open |
 | I-7 | `supabaseClient.js` is plain JavaScript in a TypeScript project | **Important** | Easy | Open |
 | I-8 | N+1 user lookup in `chatService.getMessages` | **Important** | Easy | Open |
-| R-1 | `blurhash` constant copy-pasted across four files | **Recommended** | Easy | Open |
-| R-2 | `POSTS_PER_PAGE` constant redefined in multiple files | **Recommended** | Easy | Open |
+| ~~R-1~~ | ~~`blurhash` constant copy-pasted across four files~~ | ~~**Recommended**~~ | ~~Easy~~ | ✅ Done |
+| ~~R-2~~ | ~~`POSTS_PER_PAGE` constant redefined in multiple files~~ | ~~**Recommended**~~ | ~~Easy~~ | ✅ Done |
 | R-3 | Hardcoded colors outside the theme system | **Recommended** | Medium | Open |
 | R-4 | Country selection UI duplicated between onboarding and profile | **Recommended** | Medium | Open |
 | R-5 | `ChatRoom.tsx` is an 824-line monolithic component | **Recommended** | Hard | Open |
@@ -569,7 +559,7 @@ Silent failures are among the hardest bugs to diagnose because users report "it 
 | Effort | Items | Remaining |
 |---|---|---|
 | **Trivial** | ~~R-7~~, ~~R-9~~, ~~O-7~~ | 0 of 3 |
-| **Easy** | ~~C-2~~, C-3, C-4, I-3, I-6, I-7, I-8, R-1, R-2, R-10, O-2, O-3, O-4, O-6, O-8 | 14 of 15 |
+| **Easy** | ~~C-2~~, C-3, C-4, I-3, I-6, I-7, I-8, ~~R-1~~, ~~R-2~~, R-10, O-2, O-3, O-4, O-6, O-8 | 12 of 15 |
 | **Medium** | C-5, I-1, I-2, I-4, I-5, R-3, R-4, R-6, R-8, O-5 | 10 of 10 |
 | **Hard** | C-1, C-6, R-5, O-1 | 4 of 4 |
 
@@ -577,4 +567,4 @@ Silent failures are among the hardest bugs to diagnose because users report "it 
 
 *Total items: 6 Critical · 8 Important · 10 Recommended · 8 Optional*  
 *By effort: 3 Trivial · 15 Easy · 10 Medium · 4 Hard*  
-*Progress: **4 / 32 completed** (R-7, R-9, O-7, C-2)*
+*Progress: **6 / 32 completed** (R-7, R-9, O-7, C-2, R-1, R-2)*

@@ -5,6 +5,7 @@ import React from 'react';
 import { Image } from 'expo-image';
 import { VALIDATION_LIMITS } from '../../types/forms';
 import { getCloudinaryUrl } from '../../lib/cloudinary';
+import { PLACEHOLDER_BLURHASH } from '../../constants/images';
 
 interface ImagePickerSectionProps {
   images: string[];
@@ -12,8 +13,6 @@ interface ImagePickerSectionProps {
   onRemoveImage: (index: number) => void;
   maxImages?: number;
 }
-
-const blurhash = 'L6PZfSi_.AyE_3t7t7R**0o#DgR4';
 
 export default function ImagePickerSection({
   images,
@@ -78,7 +77,7 @@ export default function ImagePickerSection({
                     style={styles.image}
                     contentFit="cover"
                     transition={200}
-                    placeholder={blurhash}
+                    placeholder={PLACEHOLDER_BLURHASH}
                   />
                 </View>
                 <IconButton

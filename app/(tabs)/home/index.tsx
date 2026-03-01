@@ -10,9 +10,7 @@ import { Post } from '../../../types/database';
 import { getCloudinaryUrl } from '../../../lib/cloudinary';
 import { useCountryStore } from '../../../store/useCountryStore';
 import { COUNTRY_DATA } from '../../../constants/CountryData';
-
-// Constants
-const POSTS_PER_PAGE = 10;
+import { POSTS_PER_PAGE } from '../../../constants/pagination';
 
 export default function Home() {
   // Theme and State

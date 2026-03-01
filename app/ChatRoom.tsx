@@ -31,7 +31,7 @@ import { getCloudinaryUrl } from '../lib/cloudinary';
 import { Image as ExpoImage } from "expo-image";
 import ProfileImage from "../components/ui/ProfileImage";
 
-const blurhash = "L6PZfSi_.AyE_3t7t7R**0o#DgR4";
+import { PLACEHOLDER_BLURHASH } from '@/constants/images';
 const MemoizedChatMessage = memo(ChatMessage);
 
 export default function ChatRoom() {
@@ -639,7 +639,7 @@ export default function ChatRoom() {
               ]}
               contentFit="cover"
               transition={300}
-              placeholder={blurhash}
+              placeholder={PLACEHOLDER_BLURHASH}
               cachePolicy="memory-disk"
             />
             <View style={styles.postTitleContainer}>
@@ -758,7 +758,7 @@ export default function ChatRoom() {
         visible={showUserInfo}
         onClose={() => setShowUserInfo(false)}
         conversation={conversation}
-        blurhash={blurhash}
+        blurhash={PLACEHOLDER_BLURHASH}
       />
     </View>
   );

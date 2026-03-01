@@ -15,9 +15,9 @@ import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { useUnreadMessagesStore } from '../../store/useUnreadMessagesStore';
 import { useAuthStore } from '../../store/useAuthStore';
 import { getCloudinaryUrl } from '../../lib/cloudinary';
+import { PLACEHOLDER_BLURHASH } from '../../constants/images';
 
 const PLACEHOLDER_IMAGE = 'https://res.cloudinary.com/dtac4dhtj/image/upload/v1701835686/placeholder_image.jpg';
-const blurhash = 'L6PZfSi_.AyE_3t7t7R**0o#DgR4';
 
 interface ConversationListProps {
     conversations: Conversation[];
@@ -108,7 +108,7 @@ export const ConversationList: React.FC<ConversationListProps> = ({
                         ]}
                         contentFit="cover"
                         transition={200}
-                        placeholder={blurhash}
+                        placeholder={PLACEHOLDER_BLURHASH}
                     />
                     <View style={styles.conversationInfo}>
                         <View style={styles.headerRow}>

@@ -10,8 +10,7 @@ import { router } from 'expo-router';
 import { useAuthStore } from '../../store/useAuthStore';
 import { useSavePost } from '../../lib/hooks/useSavePost';
 import { getCloudinaryUrl } from '../../lib/cloudinary';
-
-const blurhash = 'L6PZfSi_.AyE_3t7t7R**0o#DgR4';
+import { PLACEHOLDER_BLURHASH } from '../../constants/images';
 
 interface PostCardProps {
   post: Post;
@@ -90,7 +89,7 @@ export default function PostCard({ post, showMenu = false, onDelete, onUpdate, o
                 style={styles.cardImage}
                 contentFit="cover"
                 transition={300}
-                placeholder={blurhash}
+                placeholder={PLACEHOLDER_BLURHASH}
                 onError={() => setImageError(true)}
               />
               {imageError && (
