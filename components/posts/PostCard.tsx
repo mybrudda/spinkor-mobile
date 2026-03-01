@@ -11,6 +11,7 @@ import { useAuthStore } from '../../store/useAuthStore';
 import { useSavePost } from '../../lib/hooks/useSavePost';
 import { getCloudinaryUrl } from '../../lib/cloudinary';
 import { PLACEHOLDER_BLURHASH } from '../../constants/images';
+import { appColors } from '../../constants/theme';
 
 interface PostCardProps {
   post: Post;
@@ -98,10 +99,10 @@ export default function PostCard({ post, showMenu = false, onDelete, onUpdate, o
                   <Text style={{ color: theme.colors.onSurfaceVariant }}>Image unavailable</Text>
                 </View>
               )}
-              <View style={[styles.imageOverlay, { backgroundColor: 'rgba(0,0,0,0.5)' }]}>
+              <View style={[styles.imageOverlay, { backgroundColor: appColors.imageOverlay }]}>
                 <Text 
                   numberOfLines={1}
-                  style={{ color: "white", fontWeight: 'bold', fontSize: 14 }}
+                  style={{ color: appColors.imageOverlayText, fontWeight: 'bold', fontSize: 14 }}
                 >
                   {formatPrice(post.price, post.currency)}
                 </Text>
@@ -138,7 +139,7 @@ export default function PostCard({ post, showMenu = false, onDelete, onUpdate, o
                   <IconButton
                     icon={isSaved ? "bookmark" : "bookmark-outline"}
                     size={14}
-                    iconColor={isSaved ? "rgb(168, 96, 146)" : theme.colors.primary}
+                    iconColor={isSaved ? appColors.savedBookmark : theme.colors.primary}
                     style={[styles.actionIcon, { backgroundColor: theme.colors.primaryContainer }]}
                     onPress={handleSavePost}
                     disabled={saving || user?.id === post.user_id}
@@ -175,7 +176,7 @@ export default function PostCard({ post, showMenu = false, onDelete, onUpdate, o
                   <Text 
                     variant="bodySmall" 
                     numberOfLines={1}
-                    style={styles.date}
+                    style={[styles.date, { color: theme.colors.onSurfaceVariant }]}
                   >
                     {formatDate(post.created_at)}
                   </Text>
@@ -251,9 +252,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
   },
-  date: {
-    color: '#666',
-  },
+  date: {},
   menuContainer: {
     position: 'absolute',
     top: 0,

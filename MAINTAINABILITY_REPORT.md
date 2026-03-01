@@ -303,9 +303,9 @@ Any bug fix or behaviour change (e.g., changing image resize dimensions, changin
 
 ---
 
-### R-3 · Hardcoded Colors Outside the Theme System
+### ~~R-3 · Hardcoded Colors Outside the Theme System~~ ✅ Done
 
-**Priority:** Recommended · **Effort:** Medium
+**Priority:** Recommended · **Effort:** Medium · **Status: Completed March 2, 2026**
 
 **File(s):** `components/posts/PostCard.tsx`, `app/(tabs)/home/index.tsx`, `components/chat/ConversationList.tsx`  
 **Why it matters:** Raw hex and RGB color values (`'#666'`, `'#999'`, `'#eee'`, `'rgb(168, 96, 146)'`, `'rgba(0,0,0,0.5)'`) are used directly in `StyleSheet.create` calls instead of referencing the theme defined in `constants/theme.ts`. The project already uses `react-native-paper`'s MD3 theming system. Hardcoded colors do not respond to dark mode, making these elements look broken in dark theme.
@@ -535,7 +535,7 @@ Silent failures are among the hardest bugs to diagnose because users report "it 
 | I-8 | N+1 user lookup in `chatService.getMessages` | **Important** | Easy | Open |
 | ~~R-1~~ | ~~`blurhash` constant copy-pasted across four files~~ | ~~**Recommended**~~ | ~~Easy~~ | ✅ Done |
 | ~~R-2~~ | ~~`POSTS_PER_PAGE` constant redefined in multiple files~~ | ~~**Recommended**~~ | ~~Easy~~ | ✅ Done |
-| R-3 | Hardcoded colors outside the theme system | **Recommended** | Medium | Open |
+| ~~R-3~~ | ~~Hardcoded colors outside the theme system~~ | ~~**Recommended**~~ | ~~Medium~~ | ✅ Done |
 | R-4 | Country selection UI duplicated between onboarding and profile | **Recommended** | Medium | Open |
 | R-5 | `ChatRoom.tsx` is an 824-line monolithic component | **Recommended** | Hard | Open |
 | R-6 | Profile screen is 695 lines with an inline modal | **Recommended** | Medium | Open |
@@ -560,11 +560,11 @@ Silent failures are among the hardest bugs to diagnose because users report "it 
 |---|---|---|
 | **Trivial** | ~~R-7~~, ~~R-9~~, ~~O-7~~ | 0 of 3 |
 | **Easy** | ~~C-2~~, C-3, C-4, I-3, I-6, I-7, I-8, ~~R-1~~, ~~R-2~~, R-10, O-2, O-3, O-4, O-6, O-8 | 12 of 15 |
-| **Medium** | C-5, I-1, I-2, I-4, I-5, R-3, R-4, R-6, R-8, O-5 | 10 of 10 |
+| **Medium** | C-5, I-1, I-2, I-4, I-5, ~~R-3~~, R-4, R-6, R-8, O-5 | 9 of 10 |
 | **Hard** | C-1, C-6, R-5, O-1 | 4 of 4 |
 
 ---
 
 *Total items: 6 Critical · 8 Important · 10 Recommended · 8 Optional*  
 *By effort: 3 Trivial · 15 Easy · 10 Medium · 4 Hard*  
-*Progress: **6 / 32 completed** (R-7, R-9, O-7, C-2, R-1, R-2)*
+*Progress: **7 / 32 completed** (R-7, R-9, O-7, C-2, R-1, R-2, R-3)*

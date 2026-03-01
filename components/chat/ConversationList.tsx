@@ -16,6 +16,7 @@ import { useUnreadMessagesStore } from '../../store/useUnreadMessagesStore';
 import { useAuthStore } from '../../store/useAuthStore';
 import { getCloudinaryUrl } from '../../lib/cloudinary';
 import { PLACEHOLDER_BLURHASH } from '../../constants/images';
+import { appColors } from '../../constants/theme';
 
 const PLACEHOLDER_IMAGE = 'https://res.cloudinary.com/dtac4dhtj/image/upload/v1701835686/placeholder_image.jpg';
 
@@ -159,8 +160,8 @@ export const ConversationList: React.FC<ConversationListProps> = ({
                                     style={[
                                         styles.badge,
                                         { 
-                                            backgroundColor: '#EF4444',
-                                            color: '#FFFFFF',
+                                        backgroundColor: appColors.unreadBadge,
+                                        color: appColors.unreadBadgeText,
                                         }
                                     ]}
                                 >
@@ -241,7 +242,7 @@ const styles = StyleSheet.create({
         height: 65,
         borderRadius: 8,
         marginRight: 10,
-        backgroundColor: '#f0f0f0',
+        backgroundColor: appColors.imagePlaceholder,
     },
     conversationInfo: {
         flex: 1,

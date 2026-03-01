@@ -11,6 +11,7 @@ import { getCloudinaryUrl } from '../../../lib/cloudinary';
 import { useCountryStore } from '../../../store/useCountryStore';
 import { COUNTRY_DATA } from '../../../constants/CountryData';
 import { POSTS_PER_PAGE } from '../../../constants/pagination';
+import { appColors } from '../../../constants/theme';
 
 export default function Home() {
   // Theme and State
@@ -453,10 +454,10 @@ export default function Home() {
           color={theme.colors.onSurfaceVariant} 
         />
       </Pressable>
-      <Text variant="titleMedium" style={styles.emptyText}>
+      <Text variant="titleMedium" style={[styles.emptyText, { color: theme.colors.onSurfaceVariant }]}>
         {loading ? "Loading posts..." : (searchQuery || activeFilters) ? "No posts found" : "No posts available"}
       </Text>
-      <Text style={styles.emptySubtext}>
+      <Text style={[styles.emptySubtext, { color: theme.colors.onSurfaceVariant }]}>
         {(searchQuery || activeFilters) ? 
           "Try adjusting your search or filters" : 
           "Be the first to post something!"
@@ -481,14 +482,14 @@ export default function Home() {
       return (
         <View style={styles.footerLoader}>
           <ActivityIndicator size="small" color={theme.colors.primary} />
-          <Text style={styles.loadingMoreText}>Loading more posts...</Text>
+          <Text style={[styles.loadingMoreText, { color: theme.colors.onSurfaceVariant }]}>Loading more posts...</Text>
         </View>
       );
     }
 
     if (!hasMore) {
       return (
-        <View style={styles.endOfListContainer}>
+        <View style={[styles.endOfListContainer, { borderTopColor: theme.colors.outlineVariant }]}>
           <MaterialCommunityIcons 
             name="check-circle" 
             size={24} 
@@ -497,7 +498,7 @@ export default function Home() {
           <Text style={[styles.endOfListText, { color: theme.colors.primary }]}>
             You're all caught up!
           </Text>
-          <Text style={styles.endOfListSubtext}>
+          <Text style={[styles.endOfListSubtext, { color: theme.colors.onSurfaceVariant }]}>
             Pull to refresh for new listings
           </Text>
         </View>
@@ -603,11 +604,9 @@ const styles = StyleSheet.create({
     marginTop: 16,
     marginBottom: 8,
     textAlign: 'center',
-    color: '#666',
   },
   emptySubtext: {
     fontSize: 14,
-    color: '#999',
     textAlign: 'center',
     marginBottom: 24,
   },
@@ -621,15 +620,12 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     gap: 8,
   },
-  loadingMoreText: {
-    color: '#666',
-  },
+  loadingMoreText: {},
   endOfListContainer: {
     paddingVertical: 24,
     alignItems: 'center',
     justifyContent: 'center',
     borderTopWidth: 1,
-    borderTopColor: '#eee',
     marginTop: 16,
   },
   endOfListText: {
@@ -639,7 +635,6 @@ const styles = StyleSheet.create({
   },
   endOfListSubtext: {
     fontSize: 14,
-    color: '#666',
     marginTop: 4,
   },
   emptyListContent: {
