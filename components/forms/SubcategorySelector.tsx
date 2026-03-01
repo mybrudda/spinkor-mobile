@@ -139,7 +139,9 @@ export default function SubcategorySelector({
   if (!category) {
     return (
       <View style={styles.container}>
-        <Text variant="bodyMedium" style={[styles.placeholder, { color: theme.colors.onSurfaceVariant }]}>
+        <Text
+          variant="bodyMedium"
+          style={[styles.placeholder, { color: theme.colors.onSurfaceVariant }]}>
           Please select a category first
         </Text>
       </View>
@@ -156,8 +158,7 @@ export default function SubcategorySelector({
       <TouchableOpacity
         onPress={() => onSelectSubcategory(item)}
         activeOpacity={0.7}
-        style={styles.subcategoryItem}
-      >
+        style={styles.subcategoryItem}>
         <Card
           mode="elevated"
           style={[
@@ -166,13 +167,10 @@ export default function SubcategorySelector({
               backgroundColor: isSelected
                 ? theme.colors.primaryContainer
                 : theme.colors.surfaceVariant,
-              borderColor: isSelected
-                ? theme.colors.primary
-                : theme.colors.outline,
+              borderColor: isSelected ? theme.colors.primary : theme.colors.outline,
               borderWidth: isSelected ? 2 : 1,
             },
-          ]}
-        >
+          ]}>
           <Card.Content style={styles.cardContent}>
             <View
               style={[
@@ -182,8 +180,7 @@ export default function SubcategorySelector({
                     ? theme.colors.primary
                     : theme.colors.secondaryContainer,
                 },
-              ]}
-            >
+              ]}>
               <MaterialCommunityIcons
                 name={iconName as any}
                 size={24}
@@ -201,8 +198,7 @@ export default function SubcategorySelector({
                   fontWeight: isSelected ? '600' : '400',
                 },
               ]}
-              numberOfLines={2}
-            >
+              numberOfLines={2}>
               {formatCategoryLabel(item)}
             </Text>
           </Card.Content>
@@ -283,4 +279,3 @@ const styles = StyleSheet.create({
     marginTop: 8,
   },
 });
-

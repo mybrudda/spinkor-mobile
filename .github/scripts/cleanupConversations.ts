@@ -21,7 +21,11 @@ interface CleanupLog {
 async function cleanupConversations(): Promise<CleanupResult> {
   try {
     const now = new Date();
-    const oneMonthAgo = new Date(now.getFullYear(), now.getMonth() - 1, now.getDate()).toISOString();
+    const oneMonthAgo = new Date(
+      now.getFullYear(),
+      now.getMonth() - 1,
+      now.getDate()
+    ).toISOString();
     console.log(`Cleaning up conversations older than: ${oneMonthAgo}`);
 
     // Find conversations to delete
@@ -42,11 +46,15 @@ async function cleanupConversations(): Promise<CleanupResult> {
     console.log(`Found ${conversations.length} conversations to cleanup`);
 
     // Separate conversations by deletion reason for logging
-    const deletedByBoth = conversations.filter(c => c.deleted_by_creator && c.deleted_by_participant).length;
-    const deletedByInactivity = conversations.filter(c => new Date(c.last_activity_date) < new Date(oneMonthAgo)).length;
+    const deletedByBoth = conversations.filter(
+      (c) => c.deleted_by_creator && c.deleted_by_participant
+    ).length;
+    const deletedByInactivity = conversations.filter(
+      (c) => new Date(c.last_activity_date) < new Date(oneMonthAgo)
+    ).length;
 
     // Delete conversations directly (messages will be deleted automatically due to cascade delete)
-    const conversationIds = conversations.map(c => c.id);
+    const conversationIds = conversations.map((c) => c.id);
     const { data: deletedConversations, error: deleteError } = await supabaseAdmin
       .from('conversations')
       .delete()
@@ -56,7 +64,9 @@ async function cleanupConversations(): Promise<CleanupResult> {
     if (deleteError) throw deleteError;
 
     if (!deletedConversations || deletedConversations.length !== conversations.length) {
-      throw new Error(`Failed to delete all conversations. Expected: ${conversations.length}, Deleted: ${deletedConversations?.length || 0}`);
+      throw new Error(
+        `Failed to delete all conversations. Expected: ${conversations.length}, Deleted: ${deletedConversations?.length || 0}`
+      );
     }
 
     // Log cleanup operation
@@ -66,14 +76,12 @@ async function cleanupConversations(): Promise<CleanupResult> {
       details: {
         deleted_by_both: deletedByBoth,
         deleted_by_inactivity: deletedByInactivity,
-        timestamp: now.toISOString()
+        timestamp: now.toISOString(),
       },
-      executed_at: now.toISOString()
+      executed_at: now.toISOString(),
     };
 
-    await supabaseAdmin
-      .from('cleanup_logs')
-      .insert(cleanupLog);
+    await supabaseAdmin.from('cleanup_logs').insert(cleanupLog);
 
     console.log(`Cleanup completed. Conversations deleted: ${deletedConversations.length}`);
     console.log(`- Deleted by both users: ${deletedByBoth}`);
@@ -81,11 +89,11 @@ async function cleanupConversations(): Promise<CleanupResult> {
 
     return {
       success: true,
-      conversationsDeleted: deletedConversations.length
+      conversationsDeleted: deletedConversations.length,
     };
   } catch (error) {
     console.error('Error in cleanup process:', error);
-    
+
     // Log the error
     const errorLog: CleanupLog = {
       operation: 'conversations_cleanup',
@@ -94,15 +102,13 @@ async function cleanupConversations(): Promise<CleanupResult> {
         deleted_by_both: 0,
         deleted_by_inactivity: 0,
         error: error instanceof Error ? error.message : 'Unknown error',
-        timestamp: new Date().toISOString()
+        timestamp: new Date().toISOString(),
       },
-      executed_at: new Date().toISOString()
+      executed_at: new Date().toISOString(),
     };
 
     try {
-      await supabaseAdmin
-        .from('cleanup_logs')
-        .insert(errorLog);
+      await supabaseAdmin.from('cleanup_logs').insert(errorLog);
     } catch (logError) {
       console.error('Failed to log error to cleanup_logs:', logError);
     }
@@ -110,18 +116,17 @@ async function cleanupConversations(): Promise<CleanupResult> {
     return {
       success: false,
       conversationsDeleted: 0,
-      error: error instanceof Error ? error.message : 'Unknown error'
+      error: error instanceof Error ? error.message : 'Unknown error',
     };
   }
 }
 
 // Execute the cleanup if run directly
 if (require.main === module) {
-  cleanupConversations().catch(error => {
+  cleanupConversations().catch((error) => {
     console.error('Cleanup failed:', error);
     process.exit(1);
   });
 }
 
-export { cleanupConversations, CleanupResult }; 
-
+export { cleanupConversations, CleanupResult };

@@ -8,23 +8,27 @@ export default function NotFound() {
 
   return (
     <>
-      <Stack.Screen options={{ 
-        title: 'Oops!',
-        headerStyle: {
-          backgroundColor: theme.colors.surface,
-        },
-        headerTintColor: theme.colors.onSurface,
-      }} />
+      <Stack.Screen
+        options={{
+          title: 'Oops!',
+          headerStyle: {
+            backgroundColor: theme.colors.surface,
+          },
+          headerTintColor: theme.colors.onSurface,
+        }}
+      />
       <View style={{ flex: 1, backgroundColor: theme.colors.background }}>
-        <Surface style={{ flex: 1, justifyContent: 'center', alignItems: 'center', padding: 20 }} elevation={0}>
-          <Text variant="headlineMedium" style={{ marginBottom: 16, color: theme.colors.onSurface }}>
+        <Surface
+          style={{ flex: 1, justifyContent: 'center', alignItems: 'center', padding: 20 }}
+          elevation={0}>
+          <Text
+            variant="headlineMedium"
+            style={{ marginBottom: 16, color: theme.colors.onSurface }}>
             This screen doesn't exist.
           </Text>
           <Link href="/(tabs)/home" asChild>
-            <Button mode="contained">
-              Go back home
-            </Button>
-        </Link>
+            <Button mode="contained">Go back home</Button>
+          </Link>
         </Surface>
       </View>
     </>

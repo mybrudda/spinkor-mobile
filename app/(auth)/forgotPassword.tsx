@@ -1,4 +1,4 @@
-import React, { useRef, useState } from 'react'; 
+import React, { useRef, useState } from 'react';
 import { View, KeyboardAvoidingView, Platform, ScrollView, StyleSheet } from 'react-native';
 import { TextInput, Button, Text, useTheme, HelperText } from 'react-native-paper';
 import { router } from 'expo-router';
@@ -59,14 +59,19 @@ export default function ForgotPassword() {
     return (
       <View style={[styles.container, { backgroundColor: theme.colors.background }]}>
         <View style={styles.successContainer}>
-          <Text variant="headlineMedium" style={[styles.successTitle, { color: theme.colors.primary }]}>
+          <Text
+            variant="headlineMedium"
+            style={[styles.successTitle, { color: theme.colors.primary }]}>
             Check Your Email
           </Text>
           <Text variant="bodyLarge" style={[styles.emailText, { color: theme.colors.primary }]}>
             {email}
           </Text>
-          <Text variant="bodyMedium" style={[styles.successInstructions, { color: theme.colors.onSurfaceVariant }]}>
-            Check your email and click the link to reset your password. The link will expire in 24 hours.
+          <Text
+            variant="bodyMedium"
+            style={[styles.successInstructions, { color: theme.colors.onSurfaceVariant }]}>
+            Check your email and click the link to reset your password. The link will expire in 24
+            hours.
           </Text>
 
           <Button mode="contained" onPress={handleBackToLogin} style={styles.backButton}>
@@ -79,8 +84,7 @@ export default function ForgotPassword() {
               setSuccess(false);
               setEmail('');
             }}
-            style={styles.resendButton}
-          >
+            style={styles.resendButton}>
             Send to Different Email
           </Button>
         </View>
@@ -90,14 +94,18 @@ export default function ForgotPassword() {
 
   return (
     <View style={[styles.container, { backgroundColor: theme.colors.background }]}>
-      <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : 'height'} style={{ flex: 1 }}>
+      <KeyboardAvoidingView
+        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+        style={{ flex: 1 }}>
         <ScrollView contentContainerStyle={{ flexGrow: 1 }} keyboardShouldPersistTaps="handled">
           <View style={styles.content}>
             <Text variant="headlineMedium" style={styles.title}>
               Forgot Password?
             </Text>
 
-            <Text variant="bodyLarge" style={[styles.subtitle, { color: theme.colors.onSurfaceVariant }]}>
+            <Text
+              variant="bodyLarge"
+              style={[styles.subtitle, { color: theme.colors.onSurfaceVariant }]}>
               No worries! Enter your email address and we'll send you a link to reset your password.
             </Text>
 
@@ -125,8 +133,7 @@ export default function ForgotPassword() {
               onPress={handleResetPassword}
               style={styles.submitButton}
               loading={loading}
-              disabled={loading || !email.trim()}
-            >
+              disabled={loading || !email.trim()}>
               Send Reset Link
             </Button>
 
@@ -134,8 +141,7 @@ export default function ForgotPassword() {
               mode="text"
               onPress={handleBackToLogin}
               style={styles.backToLoginButton}
-              disabled={loading}
-            >
+              disabled={loading}>
               Back to Login
             </Button>
           </View>

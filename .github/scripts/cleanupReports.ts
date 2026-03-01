@@ -25,7 +25,7 @@ async function cleanupReports(): Promise<CleanupResult> {
     const thirtyDaysAgo = new Date(now);
     thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
     const thirtyDaysAgoISO = thirtyDaysAgo.toISOString();
-    
+
     console.log(`Cleaning up reports reviewed before: ${thirtyDaysAgoISO}`);
     console.log(`Current date: ${now.toISOString()}`);
 
@@ -50,11 +50,11 @@ async function cleanupReports(): Promise<CleanupResult> {
     console.log(`Found ${reports.length} reports to cleanup`);
 
     // Separate reports by status for logging
-    const dismissedCount = reports.filter(r => r.status === 'dismissed').length;
-    const resolvedCount = reports.filter(r => r.status === 'resolved').length;
+    const dismissedCount = reports.filter((r) => r.status === 'dismissed').length;
+    const resolvedCount = reports.filter((r) => r.status === 'resolved').length;
 
     // Delete reports
-    const reportIds = reports.map(r => r.id);
+    const reportIds = reports.map((r) => r.id);
     const { data: deletedReports, error: deleteError } = await supabaseAdmin
       .from('reports')
       .delete()
@@ -64,7 +64,9 @@ async function cleanupReports(): Promise<CleanupResult> {
     if (deleteError) throw deleteError;
 
     if (!deletedReports || deletedReports.length !== reports.length) {
-      throw new Error(`Failed to delete all reports. Expected: ${reports.length}, Deleted: ${deletedReports?.length || 0}`);
+      throw new Error(
+        `Failed to delete all reports. Expected: ${reports.length}, Deleted: ${deletedReports?.length || 0}`
+      );
     }
 
     // Log cleanup operation
@@ -74,14 +76,12 @@ async function cleanupReports(): Promise<CleanupResult> {
       details: {
         dismissed_count: dismissedCount,
         resolved_count: resolvedCount,
-        timestamp: now.toISOString()
+        timestamp: now.toISOString(),
       },
-      executed_at: now.toISOString()
+      executed_at: now.toISOString(),
     };
 
-    await supabaseAdmin
-      .from('cleanup_logs')
-      .insert(cleanupLog);
+    await supabaseAdmin.from('cleanup_logs').insert(cleanupLog);
 
     console.log(`Cleanup completed. Reports deleted: ${deletedReports.length}`);
     console.log(`- Dismissed reports: ${dismissedCount}`);
@@ -89,26 +89,24 @@ async function cleanupReports(): Promise<CleanupResult> {
 
     return {
       success: true,
-      reportsDeleted: deletedReports.length
+      reportsDeleted: deletedReports.length,
     };
   } catch (error) {
     console.error('Error in reports cleanup process:', error);
-    
+
     // Log the error
     const errorLog: CleanupLog = {
       operation: 'reports_cleanup',
       rows_affected: 0,
       details: {
         error: error instanceof Error ? error.message : 'Unknown error',
-        timestamp: new Date().toISOString()
+        timestamp: new Date().toISOString(),
       },
-      executed_at: new Date().toISOString()
+      executed_at: new Date().toISOString(),
     };
 
     try {
-      await supabaseAdmin
-        .from('cleanup_logs')
-        .insert(errorLog);
+      await supabaseAdmin.from('cleanup_logs').insert(errorLog);
     } catch (logError) {
       console.error('Failed to log error to cleanup_logs:', logError);
     }
@@ -116,19 +114,17 @@ async function cleanupReports(): Promise<CleanupResult> {
     return {
       success: false,
       reportsDeleted: 0,
-      error: error instanceof Error ? error.message : 'Unknown error'
+      error: error instanceof Error ? error.message : 'Unknown error',
     };
   }
 }
 
 // Execute the cleanup if run directly
 if (require.main === module) {
-  cleanupReports().catch(error => {
+  cleanupReports().catch((error) => {
     console.error('Reports cleanup failed:', error);
     process.exit(1);
   });
 }
 
 export { cleanupReports, CleanupResult };
-
-

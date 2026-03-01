@@ -17,12 +17,14 @@ export default function PriceDescriptionSection({
 }: PriceDescriptionSectionProps) {
   return (
     <View style={styles.container}>
-      <Text variant="titleMedium" style={styles.sectionTitle}>Price & Description</Text>
-      
+      <Text variant="titleMedium" style={styles.sectionTitle}>
+        Price & Description
+      </Text>
+
       <TextInput
         label="Price"
         value={price}
-        onChangeText={text => onInputChange('price', text)}
+        onChangeText={(text) => onInputChange('price', text)}
         keyboardType="numeric"
         error={!!errors.price}
         style={styles.input}
@@ -36,7 +38,7 @@ export default function PriceDescriptionSection({
       <TextInput
         label="Description"
         value={description}
-        onChangeText={text => onInputChange('description', text)}
+        onChangeText={(text) => onInputChange('description', text)}
         multiline
         numberOfLines={4}
         error={!!errors.description}
@@ -66,4 +68,4 @@ const styles = StyleSheet.create({
   descriptionInput: {
     minHeight: 100,
   },
-}); 
+});

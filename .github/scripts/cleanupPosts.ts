@@ -5,12 +5,12 @@ const cloudinary = require('cloudinary').v2;
 cloudinary.config({
   cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
   api_key: process.env.CLOUDINARY_API_KEY,
-  api_secret: process.env.CLOUDINARY_API_SECRET
+  api_secret: process.env.CLOUDINARY_API_SECRET,
 });
 
 const CONFIG = {
-  BATCH_SIZE: 10,            // Number of posts per batch
-  MAX_CLOUDINARY_DELETE: 100 // Max images Cloudinary allows in bulk delete
+  BATCH_SIZE: 10, // Number of posts per batch
+  MAX_CLOUDINARY_DELETE: 100, // Max images Cloudinary allows in bulk delete
 };
 
 interface CleanupResult {
@@ -48,7 +48,7 @@ interface Post {
 
 // Helper function to construct full Cloudinary public IDs for posts
 function constructPostImagePublicIds(imageIds: string[]): string[] {
-  return imageIds.map(imageId => {
+  return imageIds.map((imageId) => {
     // If imageId already includes folder prefix, use as is
     if (imageId.includes('/')) {
       return imageId;
@@ -59,7 +59,9 @@ function constructPostImagePublicIds(imageIds: string[]): string[] {
 }
 
 // Bulk delete images via Cloudinary Admin API
-async function deleteImagesFromCloudinary(imageIds: string[]): Promise<{ deleted: string[], failed: string[] }> {
+async function deleteImagesFromCloudinary(
+  imageIds: string[]
+): Promise<{ deleted: string[]; failed: string[] }> {
   if (imageIds.length === 0) {
     return { deleted: [], failed: [] };
   }
@@ -67,13 +69,13 @@ async function deleteImagesFromCloudinary(imageIds: string[]): Promise<{ deleted
   try {
     // Construct full public IDs with folder prefix for posts
     const publicIds = constructPostImagePublicIds(imageIds);
-    
+
     console.log(`Attempting to delete ${publicIds.length} images from Cloudinary...`);
-    
+
     // Cloudinary Admin API allows up to 100 images per call
     const result = await cloudinary.api.delete_resources(publicIds, {
       type: 'upload',
-      resource_type: 'image'
+      resource_type: 'image',
     });
 
     const deleted: string[] = [];
@@ -96,7 +98,7 @@ async function deleteImagesFromCloudinary(imageIds: string[]): Promise<{ deleted
     }
 
     console.log(`Cloudinary deletion result: ${deleted.length} deleted, ${failed.length} failed`);
-    
+
     return { deleted, failed };
   } catch (error) {
     console.error('Cloudinary bulk delete error:', error);
@@ -110,7 +112,7 @@ async function getExpiredPosts(offset: number): Promise<Post[]> {
   const sevenDaysAgo = new Date();
   sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
   const sevenDaysAgoISO = sevenDaysAgo.toISOString();
-  
+
   const { data, error } = await supabaseAdmin
     .from('posts')
     .select('id, image_ids')
@@ -161,14 +163,11 @@ async function cleanupExpiredPosts(): Promise<CleanupResult> {
       // Process each post individually to ensure atomicity
       for (const post of posts) {
         const imageIds = post.image_ids || [];
-        
+
         if (imageIds.length === 0) {
           // Post has no images, safe to delete directly
           try {
-            const { error } = await supabaseAdmin
-              .from('posts')
-              .delete()
-              .eq('id', post.id);
+            const { error } = await supabaseAdmin.from('posts').delete().eq('id', post.id);
 
             if (error) {
               console.error(`Failed to delete post ${post.id}:`, error);
@@ -188,13 +187,10 @@ async function cleanupExpiredPosts(): Promise<CleanupResult> {
         try {
           console.log(`Processing post ${post.id} with ${imageIds.length} images`);
           const { deleted, failed } = await deleteImagesFromCloudinary(imageIds);
-          
+
           if (failed.length === 0) {
             // All images deleted successfully, safe to delete post
-            const { error } = await supabaseAdmin
-              .from('posts')
-              .delete()
-              .eq('id', post.id);
+            const { error } = await supabaseAdmin.from('posts').delete().eq('id', post.id);
 
             if (error) {
               console.error(`Failed to delete post ${post.id}:`, error);
@@ -209,11 +205,11 @@ async function cleanupExpiredPosts(): Promise<CleanupResult> {
             totalPostsSkipped++;
             totalImagesFailed += failed.length;
             totalImagesDeleted += deleted.length;
-            
+
             failedDeletions.push({
               postId: post.id,
               imageIds: failed,
-              error: 'Failed to delete images from Cloudinary'
+              error: 'Failed to delete images from Cloudinary',
             });
 
             console.log(`Skipped post ${post.id}: ${failed.length} images failed to delete`);
@@ -222,11 +218,11 @@ async function cleanupExpiredPosts(): Promise<CleanupResult> {
           console.error(`Error processing post ${post.id}:`, error);
           totalPostsSkipped++;
           totalImagesFailed += imageIds.length;
-          
+
           failedDeletions.push({
             postId: post.id,
             imageIds: imageIds,
-            error: error instanceof Error ? error.message : 'Unknown error'
+            error: error instanceof Error ? error.message : 'Unknown error',
           });
         }
       }
@@ -244,7 +240,7 @@ async function cleanupExpiredPosts(): Promise<CleanupResult> {
         posts_failed: totalPostsSkipped,
         images_failed: totalImagesFailed,
         failed_deletions: failedDeletions,
-        timestamp: new Date().toISOString()
+        timestamp: new Date().toISOString(),
       },
       executed_at: new Date().toISOString(),
     };
@@ -259,8 +255,12 @@ async function cleanupExpiredPosts(): Promise<CleanupResult> {
     console.log(`- Images failed: ${totalImagesFailed}`);
 
     if (totalImagesFailed > 0) {
-      console.warn(`Warning: ${totalImagesFailed} images failed to delete. Check cleanup_logs for details.`);
-      console.warn(`Posts with failed images were skipped to prevent orphaned images in Cloudinary.`);
+      console.warn(
+        `Warning: ${totalImagesFailed} images failed to delete. Check cleanup_logs for details.`
+      );
+      console.warn(
+        `Posts with failed images were skipped to prevent orphaned images in Cloudinary.`
+      );
     }
 
     return {
@@ -268,9 +268,8 @@ async function cleanupExpiredPosts(): Promise<CleanupResult> {
       postsDeleted: totalPostsDeleted,
       imagesDeleted: totalImagesDeleted,
       imagesFailed: totalImagesFailed,
-      postsSkipped: totalPostsSkipped
+      postsSkipped: totalPostsSkipped,
     };
-
   } catch (error) {
     console.error('Cleanup error:', error);
 
@@ -284,9 +283,9 @@ async function cleanupExpiredPosts(): Promise<CleanupResult> {
         posts_failed: 0,
         images_failed: 0,
         failed_deletions: [],
-        timestamp: new Date().toISOString()
+        timestamp: new Date().toISOString(),
       },
-      executed_at: new Date().toISOString()
+      executed_at: new Date().toISOString(),
     };
 
     await logCleanupOperation(errorLog);
@@ -308,6 +307,3 @@ if (require.main === module) {
 }
 
 export { cleanupExpiredPosts };
-
-
-

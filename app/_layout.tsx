@@ -1,17 +1,20 @@
-import FontAwesome from "@expo/vector-icons/FontAwesome";
-import { useFonts } from "expo-font";
-import { Stack } from "expo-router";
-import * as SplashScreen from "expo-splash-screen";
-import { useEffect } from "react";
-import { PaperProvider, } from "react-native-paper";
-import { useThemeStore } from "../store/useThemeStore";
-import { SafeAreaProvider } from "react-native-safe-area-context";
-import SafeScreen from "@/components/layout/SafeScreen";
-import { StatusBar } from "expo-status-bar";
+import FontAwesome from '@expo/vector-icons/FontAwesome';
+import { useFonts } from 'expo-font';
+import { Stack } from 'expo-router';
+import * as SplashScreen from 'expo-splash-screen';
+import { useEffect } from 'react';
+import { PaperProvider } from 'react-native-paper';
+import { useThemeStore } from '../store/useThemeStore';
+import { SafeAreaProvider } from 'react-native-safe-area-context';
+import SafeScreen from '@/components/layout/SafeScreen';
+import { StatusBar } from 'expo-status-bar';
 import { AuthProvider } from '../components/auth/AuthProvider';
 import { getTheme } from '../constants/theme';
-import { View, useColorScheme } from "react-native";
-import { DarkTheme as NavigationDarkTheme, DefaultTheme as NavigationDefaultTheme } from '@react-navigation/native';
+import { View, useColorScheme } from 'react-native';
+import {
+  DarkTheme as NavigationDarkTheme,
+  DefaultTheme as NavigationDefaultTheme,
+} from '@react-navigation/native';
 import { pushNotificationService } from '../lib/pushNotificationService';
 import { useAuthStore } from '../store/useAuthStore';
 import { useUnreadMessagesStore } from '../store/useUnreadMessagesStore';
@@ -20,10 +23,10 @@ import { useCountryStore } from '../store/useCountryStore';
 export {
   // Catch any errors thrown by the Layout component.
   ErrorBoundary,
-} from "expo-router";
+} from 'expo-router';
 
 export const unstable_settings = {
-  initialRouteName: "(tabs)", // Default route when app loads
+  initialRouteName: '(tabs)', // Default route when app loads
 };
 
 // Prevent the splash screen from auto-hiding before asset loading is complete.
@@ -31,7 +34,7 @@ SplashScreen.preventAutoHideAsync();
 
 export default function RootLayout() {
   const [loaded, error] = useFonts({
-    SpaceMono: require("../assets/fonts/SpaceMono-Regular.ttf"),
+    SpaceMono: require('../assets/fonts/SpaceMono-Regular.ttf'),
     ...FontAwesome.font,
   });
 
@@ -112,7 +115,7 @@ function RootLayoutNav() {
     const handleTokenRegistration = async () => {
       if (user) {
         const hasToken = await pushNotificationService.hasToken();
-        
+
         if (!hasToken) {
           await pushNotificationService.registerForPushNotifications();
         }
@@ -121,7 +124,7 @@ function RootLayoutNav() {
       }
     };
 
-    handleTokenRegistration().catch(error => {
+    handleTokenRegistration().catch((error) => {
       console.error('Error during push token registration:', error);
     });
   }, [user, isAuthInitialized]);
@@ -131,19 +134,15 @@ function RootLayoutNav() {
   return (
     <SafeAreaProvider>
       <View style={{ flex: 1, backgroundColor: paperTheme.colors.background }}>
-        <StatusBar 
-          style={isDarkMode ? "light" : "dark"}
-          translucent={true}
-        />
+        <StatusBar style={isDarkMode ? 'light' : 'dark'} translucent={true} />
         <SafeScreen>
           <PaperProvider theme={paperTheme}>
             <AuthProvider>
-              <Stack 
-                screenOptions={{ 
+              <Stack
+                screenOptions={{
                   headerShown: false,
-                  contentStyle: { backgroundColor: navigationTheme.colors.background }
-                }}
-              >
+                  contentStyle: { backgroundColor: navigationTheme.colors.background },
+                }}>
                 <Stack.Screen name="index" />
                 <Stack.Screen name="(onboarding)" />
                 <Stack.Screen name="(auth)" />

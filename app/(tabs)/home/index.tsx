@@ -1,11 +1,21 @@
-import { View, FlatList, StyleSheet, RefreshControl, ListRenderItem, Pressable } from 'react-native';
+import {
+  View,
+  FlatList,
+  StyleSheet,
+  RefreshControl,
+  ListRenderItem,
+  Pressable,
+} from 'react-native';
 import React, { useEffect, useState, useCallback, useMemo } from 'react';
 import { Text, useTheme, ActivityIndicator, Button } from 'react-native-paper';
 import { supabase } from '../../../supabaseClient';
 import { router } from 'expo-router';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import PostCard from '../../../components/posts/PostCard';
-import FilterSection, { FilterOptions, DEFAULT_YEAR_RANGE } from '../../../components/posts/FilterSection';
+import FilterSection, {
+  FilterOptions,
+  DEFAULT_YEAR_RANGE,
+} from '../../../components/posts/FilterSection';
 import { Post } from '../../../types/database';
 import { getCloudinaryUrl } from '../../../lib/cloudinary';
 import { useCountryStore } from '../../../store/useCountryStore';
@@ -31,243 +41,18 @@ export default function Home() {
   const countryName = country ? COUNTRY_DATA[country].name : null;
 
   // Fetch initial posts without filters
-  const fetchInitialPosts = useCallback(async (start = 0, shouldAccumulate = false) => {
-    try {
-      setError(null);
-      if (!shouldAccumulate) {
-        setLoading(true);
-      }
-
-      let query = supabase
-        .from('posts')
-        .select(`
-          *,
-          user:user_id (
-            id,
-            username,
-            display_name,
-            profile_image_id,
-            email,
-            user_type,
-            is_verified
-          )
-        `, { count: 'exact' })
-        .eq('status', 'active');
-
-      // Filter by country if selected
-      if (countryName) {
-        query = query.eq('location->>country', countryName);
-      }
-
-      query = query
-        .order('created_at', { ascending: false })
-        .range(start, start + POSTS_PER_PAGE - 1);
-
-      const { data, error: supabaseError, count } = await query;
-
-      if (supabaseError) {
-        throw new Error(supabaseError.message);
-      }
-
-      const total = count || 0;
-      setTotalCount(total);
-      setHasMore(start + POSTS_PER_PAGE < total);
-      
-      // Accumulate data if loading more, otherwise replace
-      setPosts(prev => shouldAccumulate ? [...prev, ...(data || [])] : (data || []));
-
-      if (__DEV__) {
-        console.log('Initial fetch:', {
-          totalPosts: total,
-          fetchedPosts: data?.length,
-          start,
-          shouldAccumulate,
-          countryFilter: countryName
-        });
-      }
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'An error occurred while fetching posts');
-      console.error('Error fetching initial posts:', err);
-    } finally {
-      setLoading(false);
-    }
-  }, [countryName]);
-
-  // Fetch posts with filters
-  const fetchFilteredPosts = useCallback(async (start = 0, filters: FilterOptions, shouldAccumulate = false) => {
-    try {
-      setError(null);
-      if (!shouldAccumulate) {
-        setLoading(true);
-      }
-      
-      let query = supabase
-        .from('posts')
-        .select(`
-          *,
-          user:user_id (
-            id,
-            username,
-            display_name,
-            profile_image_id,
-            email,
-            user_type,
-            is_verified
-          )
-        `, { count: 'exact' })
-        .eq('status', 'active');
-
-      // Apply filters
-      if (filters.listingType) {
-        query = query.eq('listing_type', filters.listingType);
-      }
-
-      if (filters.city) {
-        query = query.eq('location->>city', filters.city);
-      }
-
-      if (filters.category) {
-        query = query.eq('category', filters.category);
-      }
-
-      if (filters.subcategory) {
-        query = query.eq('subcategory', filters.subcategory);
-      }
-
-      if (filters.priceRange.min) {
-        query = query.gte('price', parseFloat(filters.priceRange.min));
-      }
-      if (filters.priceRange.max) {
-        query = query.lte('price', parseFloat(filters.priceRange.max));
-      }
-
-      if (filters.make.trim()) {
-        query = query.ilike('details->>make', `%${filters.make.trim()}%`);
-      }
-      if (filters.model.trim()) {
-        query = query.ilike('details->>model', `%${filters.model.trim()}%`);
-      }
-
-      const yearFilterActive =
-        filters.category === 'vehicles' &&
-        (filters.yearRange.min > DEFAULT_YEAR_RANGE.min || filters.yearRange.max < DEFAULT_YEAR_RANGE.max);
-
-      if (yearFilterActive) {
-        query = query
-          .gte('details->>year', filters.yearRange.min.toString())
-          .lte('details->>year', filters.yearRange.max.toString());
-      }
-
-      const { data, error: supabaseError, count } = await query
-        .order('created_at', { ascending: false })
-        .range(start, start + POSTS_PER_PAGE - 1);
-
-      if (supabaseError) {
-        throw new Error(supabaseError.message);
-      }
-
-      const total = count || 0;
-      setTotalCount(total);
-      setHasMore(start + POSTS_PER_PAGE < total);
-      
-      // Accumulate data if loading more, otherwise replace
-      setPosts(prev => shouldAccumulate ? [...prev, ...(data || [])] : (data || []));
-
-      if (__DEV__) {
-        console.log('Filtered fetch:', {
-          totalPosts: total,
-          fetchedPosts: data?.length,
-          filters,
-          start,
-          shouldAccumulate
-        });
-      }
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'An error occurred while fetching posts');
-      console.error('Error fetching filtered posts:', err);
-    } finally {
-      if (!shouldAccumulate) {
-        setLoading(false);
-      }
-    }
-  }, [countryName]);
-
-  // Handle search
-  const handleSearch = useCallback((searchText: string) => {
-    // Clear any active filters when searching
-    setActiveFilters(null);
-    setSearchQuery(searchText);
-    setPage(0);
-    setHasMore(true);
-    
-    const currentCountryName = countryName; // Capture current country value
-    
-    const searchPosts = async () => {
+  const fetchInitialPosts = useCallback(
+    async (start = 0, shouldAccumulate = false) => {
       try {
-        setLoading(true);
         setError(null);
-
-        let searchQuery = supabase
-          .from('posts')
-          .select(`
-            *,
-            user:user_id (
-              id,
-              username,
-              display_name,
-              profile_image_id,
-              email,
-              user_type,
-              is_verified
-            )
-          `, { count: 'exact' })
-          .eq('status', 'active')
-          .ilike('title', `%${searchText}%`);
-
-        // Filter by country if selected
-        if (currentCountryName) {
-          searchQuery = searchQuery.eq('location->>country', currentCountryName);
+        if (!shouldAccumulate) {
+          setLoading(true);
         }
-
-        const { data, error: supabaseError, count } = await searchQuery
-          .order('created_at', { ascending: false })
-          .range(0, POSTS_PER_PAGE - 1);
-
-        if (supabaseError) {
-          throw new Error(supabaseError.message);
-        }
-
-        const total = count || 0;
-        setTotalCount(total);
-        setHasMore(POSTS_PER_PAGE < total);
-        setPosts(data || []);
-      } catch (err) {
-        setError(err instanceof Error ? err.message : 'An error occurred while searching posts');
-        console.error('Error searching posts:', err);
-      } finally {
-        setLoading(false);
-      }
-    };
-    
-    searchPosts();
-  }, [countryName]);
-
-  // Handle filter changes
-  const handleFilter = useCallback(async (filters: FilterOptions) => {
-    setActiveFilters(filters);
-    setSearchQuery('');
-    setPage(0);
-    setHasMore(true);
-    
-    const fetchFilteredPosts = async () => {
-      try {
-        setLoading(true);
-        setError(null);
-        const start = 0;
 
         let query = supabase
-        .from('posts')
-        .select(`
+          .from('posts')
+          .select(
+            `
           *,
           user:user_id (
             id,
@@ -278,7 +63,9 @@ export default function Home() {
             user_type,
             is_verified
           )
-        `, { count: 'exact' })
+        `,
+            { count: 'exact' }
+          )
           .eq('status', 'active');
 
         // Filter by country if selected
@@ -286,25 +73,87 @@ export default function Home() {
           query = query.eq('location->>country', countryName);
         }
 
+        query = query
+          .order('created_at', { ascending: false })
+          .range(start, start + POSTS_PER_PAGE - 1);
+
+        const { data, error: supabaseError, count } = await query;
+
+        if (supabaseError) {
+          throw new Error(supabaseError.message);
+        }
+
+        const total = count || 0;
+        setTotalCount(total);
+        setHasMore(start + POSTS_PER_PAGE < total);
+
+        // Accumulate data if loading more, otherwise replace
+        setPosts((prev) => (shouldAccumulate ? [...prev, ...(data || [])] : data || []));
+
+        if (__DEV__) {
+          console.log('Initial fetch:', {
+            totalPosts: total,
+            fetchedPosts: data?.length,
+            start,
+            shouldAccumulate,
+            countryFilter: countryName,
+          });
+        }
+      } catch (err) {
+        setError(err instanceof Error ? err.message : 'An error occurred while fetching posts');
+        console.error('Error fetching initial posts:', err);
+      } finally {
+        setLoading(false);
+      }
+    },
+    [countryName]
+  );
+
+  // Fetch posts with filters
+  const fetchFilteredPosts = useCallback(
+    async (start = 0, filters: FilterOptions, shouldAccumulate = false) => {
+      try {
+        setError(null);
+        if (!shouldAccumulate) {
+          setLoading(true);
+        }
+
+        let query = supabase
+          .from('posts')
+          .select(
+            `
+          *,
+          user:user_id (
+            id,
+            username,
+            display_name,
+            profile_image_id,
+            email,
+            user_type,
+            is_verified
+          )
+        `,
+            { count: 'exact' }
+          )
+          .eq('status', 'active');
+
         // Apply filters
         if (filters.listingType) {
           query = query.eq('listing_type', filters.listingType);
         }
+
         if (filters.city) {
           query = query.eq('location->>city', filters.city);
         }
+
         if (filters.category) {
           query = query.eq('category', filters.category);
         }
+
         if (filters.subcategory) {
           query = query.eq('subcategory', filters.subcategory);
         }
-        if (filters.make.trim()) {
-          query = query.ilike('details->>make', `%${filters.make.trim()}%`);
-        }
-        if (filters.model.trim()) {
-          query = query.ilike('details->>model', `%${filters.model.trim()}%`);
-        }
+
         if (filters.priceRange.min) {
           query = query.gte('price', parseFloat(filters.priceRange.min));
         }
@@ -312,9 +161,17 @@ export default function Home() {
           query = query.lte('price', parseFloat(filters.priceRange.max));
         }
 
+        if (filters.make.trim()) {
+          query = query.ilike('details->>make', `%${filters.make.trim()}%`);
+        }
+        if (filters.model.trim()) {
+          query = query.ilike('details->>model', `%${filters.model.trim()}%`);
+        }
+
         const yearFilterActive =
           filters.category === 'vehicles' &&
-          (filters.yearRange.min > DEFAULT_YEAR_RANGE.min || filters.yearRange.max < DEFAULT_YEAR_RANGE.max);
+          (filters.yearRange.min > DEFAULT_YEAR_RANGE.min ||
+            filters.yearRange.max < DEFAULT_YEAR_RANGE.max);
 
         if (yearFilterActive) {
           query = query
@@ -322,7 +179,11 @@ export default function Home() {
             .lte('details->>year', filters.yearRange.max.toString());
         }
 
-        const { data, error: supabaseError, count } = await query
+        const {
+          data,
+          error: supabaseError,
+          count,
+        } = await query
           .order('created_at', { ascending: false })
           .range(start, start + POSTS_PER_PAGE - 1);
 
@@ -333,26 +194,213 @@ export default function Home() {
         const total = count || 0;
         setTotalCount(total);
         setHasMore(start + POSTS_PER_PAGE < total);
-        setPosts(data || []);
+
+        // Accumulate data if loading more, otherwise replace
+        setPosts((prev) => (shouldAccumulate ? [...prev, ...(data || [])] : data || []));
 
         if (__DEV__) {
           console.log('Filtered fetch:', {
             totalPosts: total,
             fetchedPosts: data?.length,
             filters,
-            start
+            start,
+            shouldAccumulate,
           });
         }
       } catch (err) {
         setError(err instanceof Error ? err.message : 'An error occurred while fetching posts');
         console.error('Error fetching filtered posts:', err);
       } finally {
-        setLoading(false);
+        if (!shouldAccumulate) {
+          setLoading(false);
+        }
       }
-    };
+    },
+    [countryName]
+  );
 
-    fetchFilteredPosts();
-  }, [countryName]);
+  // Handle search
+  const handleSearch = useCallback(
+    (searchText: string) => {
+      // Clear any active filters when searching
+      setActiveFilters(null);
+      setSearchQuery(searchText);
+      setPage(0);
+      setHasMore(true);
+
+      const currentCountryName = countryName; // Capture current country value
+
+      const searchPosts = async () => {
+        try {
+          setLoading(true);
+          setError(null);
+
+          let searchQuery = supabase
+            .from('posts')
+            .select(
+              `
+            *,
+            user:user_id (
+              id,
+              username,
+              display_name,
+              profile_image_id,
+              email,
+              user_type,
+              is_verified
+            )
+          `,
+              { count: 'exact' }
+            )
+            .eq('status', 'active')
+            .ilike('title', `%${searchText}%`);
+
+          // Filter by country if selected
+          if (currentCountryName) {
+            searchQuery = searchQuery.eq('location->>country', currentCountryName);
+          }
+
+          const {
+            data,
+            error: supabaseError,
+            count,
+          } = await searchQuery
+            .order('created_at', { ascending: false })
+            .range(0, POSTS_PER_PAGE - 1);
+
+          if (supabaseError) {
+            throw new Error(supabaseError.message);
+          }
+
+          const total = count || 0;
+          setTotalCount(total);
+          setHasMore(POSTS_PER_PAGE < total);
+          setPosts(data || []);
+        } catch (err) {
+          setError(err instanceof Error ? err.message : 'An error occurred while searching posts');
+          console.error('Error searching posts:', err);
+        } finally {
+          setLoading(false);
+        }
+      };
+
+      searchPosts();
+    },
+    [countryName]
+  );
+
+  // Handle filter changes
+  const handleFilter = useCallback(
+    async (filters: FilterOptions) => {
+      setActiveFilters(filters);
+      setSearchQuery('');
+      setPage(0);
+      setHasMore(true);
+
+      const fetchFilteredPosts = async () => {
+        try {
+          setLoading(true);
+          setError(null);
+          const start = 0;
+
+          let query = supabase
+            .from('posts')
+            .select(
+              `
+          *,
+          user:user_id (
+            id,
+            username,
+            display_name,
+            profile_image_id,
+            email,
+            user_type,
+            is_verified
+          )
+        `,
+              { count: 'exact' }
+            )
+            .eq('status', 'active');
+
+          // Filter by country if selected
+          if (countryName) {
+            query = query.eq('location->>country', countryName);
+          }
+
+          // Apply filters
+          if (filters.listingType) {
+            query = query.eq('listing_type', filters.listingType);
+          }
+          if (filters.city) {
+            query = query.eq('location->>city', filters.city);
+          }
+          if (filters.category) {
+            query = query.eq('category', filters.category);
+          }
+          if (filters.subcategory) {
+            query = query.eq('subcategory', filters.subcategory);
+          }
+          if (filters.make.trim()) {
+            query = query.ilike('details->>make', `%${filters.make.trim()}%`);
+          }
+          if (filters.model.trim()) {
+            query = query.ilike('details->>model', `%${filters.model.trim()}%`);
+          }
+          if (filters.priceRange.min) {
+            query = query.gte('price', parseFloat(filters.priceRange.min));
+          }
+          if (filters.priceRange.max) {
+            query = query.lte('price', parseFloat(filters.priceRange.max));
+          }
+
+          const yearFilterActive =
+            filters.category === 'vehicles' &&
+            (filters.yearRange.min > DEFAULT_YEAR_RANGE.min ||
+              filters.yearRange.max < DEFAULT_YEAR_RANGE.max);
+
+          if (yearFilterActive) {
+            query = query
+              .gte('details->>year', filters.yearRange.min.toString())
+              .lte('details->>year', filters.yearRange.max.toString());
+          }
+
+          const {
+            data,
+            error: supabaseError,
+            count,
+          } = await query
+            .order('created_at', { ascending: false })
+            .range(start, start + POSTS_PER_PAGE - 1);
+
+          if (supabaseError) {
+            throw new Error(supabaseError.message);
+          }
+
+          const total = count || 0;
+          setTotalCount(total);
+          setHasMore(start + POSTS_PER_PAGE < total);
+          setPosts(data || []);
+
+          if (__DEV__) {
+            console.log('Filtered fetch:', {
+              totalPosts: total,
+              fetchedPosts: data?.length,
+              filters,
+              start,
+            });
+          }
+        } catch (err) {
+          setError(err instanceof Error ? err.message : 'An error occurred while fetching posts');
+          console.error('Error fetching filtered posts:', err);
+        } finally {
+          setLoading(false);
+        }
+      };
+
+      fetchFilteredPosts();
+    },
+    [countryName]
+  );
 
   // Handle reset
   const handleReset = useCallback(() => {
@@ -365,7 +413,8 @@ export default function Home() {
   }, [fetchInitialPosts]);
 
   // Initial load - fetch all posts without filters
-  useEffect(() => { // useEffect will run twice on initial load due to REACT sctrict mode
+  useEffect(() => {
+    // useEffect will run twice on initial load due to REACT sctrict mode
     let mounted = true;
 
     const loadInitialData = async () => {
@@ -398,7 +447,7 @@ export default function Home() {
     if (refreshing) return;
     setRefreshing(true);
     setPage(0);
-    
+
     const fetchData = async () => {
       if (activeFilters) {
         await fetchFilteredPosts(0, activeFilters, false);
@@ -407,7 +456,7 @@ export default function Home() {
       }
       setRefreshing(false);
     };
-    
+
     fetchData();
   }, [refreshing, activeFilters, fetchFilteredPosts, fetchInitialPosts]);
 
@@ -422,7 +471,7 @@ export default function Home() {
     }
 
     setLoadingMore(true);
-    setPage(prev => prev + 1);
+    setPage((prev) => prev + 1);
 
     const loadMore = async () => {
       if (activeFilters) {
@@ -434,55 +483,69 @@ export default function Home() {
     };
 
     loadMore();
-  }, [loadingMore, hasMore, page, totalCount, activeFilters, fetchFilteredPosts, fetchInitialPosts]);
+  }, [
+    loadingMore,
+    hasMore,
+    page,
+    totalCount,
+    activeFilters,
+    fetchFilteredPosts,
+    fetchInitialPosts,
+  ]);
 
   // Pad posts to ensure consistent two-column layout
   const numColumns = 2;
-  const paddedPosts = posts.length % numColumns === 0 ? posts : [...posts, ...Array(numColumns - (posts.length % numColumns)).fill(null)];
+  const paddedPosts =
+    posts.length % numColumns === 0
+      ? posts
+      : [...posts, ...Array(numColumns - (posts.length % numColumns)).fill(null)];
 
   // Memoized Components
-  const ListHeaderComponent = useMemo(() => (
-    <View style={styles.headerSpacer} />
-  ), []);
+  const ListHeaderComponent = useMemo(() => <View style={styles.headerSpacer} />, []);
 
-  const ListEmptyComponent = useMemo(() => (
-    <View style={styles.emptyContainer}>
-      <Pressable onPress={handleReset}>
-        <MaterialCommunityIcons 
-          name="shopping" 
-          size={48} 
-          color={theme.colors.onSurfaceVariant} 
-        />
-      </Pressable>
-      <Text variant="titleMedium" style={[styles.emptyText, { color: theme.colors.onSurfaceVariant }]}>
-        {loading ? "Loading posts..." : (searchQuery || activeFilters) ? "No posts found" : "No posts available"}
-      </Text>
-      <Text style={[styles.emptySubtext, { color: theme.colors.onSurfaceVariant }]}>
-        {(searchQuery || activeFilters) ? 
-          "Try adjusting your search or filters" : 
-          "Be the first to post something!"
-        }
-      </Text>
-      {!searchQuery && !activeFilters && (
-        <Button 
-          mode="contained" 
-          onPress={() => router.replace('/(tabs)/create')}
-          style={styles.emptyButton}
-        >
-          Create Post
-        </Button>
-      )}
-    </View>
-  ), [theme.colors.onSurfaceVariant, loading, searchQuery, activeFilters, handleReset]);
+  const ListEmptyComponent = useMemo(
+    () => (
+      <View style={styles.emptyContainer}>
+        <Pressable onPress={handleReset}>
+          <MaterialCommunityIcons name="shopping" size={48} color={theme.colors.onSurfaceVariant} />
+        </Pressable>
+        <Text
+          variant="titleMedium"
+          style={[styles.emptyText, { color: theme.colors.onSurfaceVariant }]}>
+          {loading
+            ? 'Loading posts...'
+            : searchQuery || activeFilters
+              ? 'No posts found'
+              : 'No posts available'}
+        </Text>
+        <Text style={[styles.emptySubtext, { color: theme.colors.onSurfaceVariant }]}>
+          {searchQuery || activeFilters
+            ? 'Try adjusting your search or filters'
+            : 'Be the first to post something!'}
+        </Text>
+        {!searchQuery && !activeFilters && (
+          <Button
+            mode="contained"
+            onPress={() => router.replace('/(tabs)/create')}
+            style={styles.emptyButton}>
+            Create Post
+          </Button>
+        )}
+      </View>
+    ),
+    [theme.colors.onSurfaceVariant, loading, searchQuery, activeFilters, handleReset]
+  );
 
   const ListFooterComponent = useCallback(() => {
     if (posts.length === 0) return null;
-    
+
     if (loadingMore) {
       return (
         <View style={styles.footerLoader}>
           <ActivityIndicator size="small" color={theme.colors.primary} />
-          <Text style={[styles.loadingMoreText, { color: theme.colors.onSurfaceVariant }]}>Loading more posts...</Text>
+          <Text style={[styles.loadingMoreText, { color: theme.colors.onSurfaceVariant }]}>
+            Loading more posts...
+          </Text>
         </View>
       );
     }
@@ -490,11 +553,7 @@ export default function Home() {
     if (!hasMore) {
       return (
         <View style={[styles.endOfListContainer, { borderTopColor: theme.colors.outlineVariant }]}>
-          <MaterialCommunityIcons 
-            name="check-circle" 
-            size={24} 
-            color={theme.colors.primary}
-          />
+          <MaterialCommunityIcons name="check-circle" size={24} color={theme.colors.primary} />
           <Text style={[styles.endOfListText, { color: theme.colors.primary }]}>
             You're all caught up!
           </Text>
@@ -508,13 +567,19 @@ export default function Home() {
     return null;
   }, [loadingMore, hasMore, theme.colors.primary, posts.length]);
 
-  const renderItem: ListRenderItem<Post> = useCallback(({ item }) => (
-    <View style={styles.postCardWrapper}>
-      <PostCard post={item} cardStyle={styles.postCard} />
-    </View>
-  ), []);
+  const renderItem: ListRenderItem<Post> = useCallback(
+    ({ item }) => (
+      <View style={styles.postCardWrapper}>
+        <PostCard post={item} cardStyle={styles.postCard} />
+      </View>
+    ),
+    []
+  );
 
-  const keyExtractor = useCallback((item: Post | null, index: number) => item ? item.id : `empty-${index}`, []);
+  const keyExtractor = useCallback(
+    (item: Post | null, index: number) => (item ? item.id : `empty-${index}`),
+    []
+  );
 
   // Error State
   if (error) {
@@ -530,15 +595,15 @@ export default function Home() {
 
   return (
     <View style={[styles.container, { backgroundColor: theme.colors.background }]}>
-      <FilterSection 
-        onSearch={handleSearch} 
-        onFilter={handleFilter}
-        onLogoPress={handleReset}
-      />
+      <FilterSection onSearch={handleSearch} onFilter={handleFilter} onLogoPress={handleReset} />
       <FlatList
         data={paddedPosts}
         renderItem={(info) =>
-          info.item ? renderItem({ ...info, item: info.item }) : <View style={[styles.postCardWrapper, { backgroundColor: 'transparent' }]} />
+          info.item ? (
+            renderItem({ ...info, item: info.item })
+          ) : (
+            <View style={[styles.postCardWrapper, { backgroundColor: 'transparent' }]} />
+          )
         }
         keyExtractor={keyExtractor}
         contentContainerStyle={styles.listContainer}
@@ -559,12 +624,11 @@ export default function Home() {
         columnWrapperStyle={styles.columnWrapper}
         showsVerticalScrollIndicator={false}
       />
-      <Button 
-        mode="contained" 
+      <Button
+        mode="contained"
         onPress={() => router.push('/(tabs)/create')}
         style={styles.fab}
-        icon="plus"
-      >
+        icon="plus">
         Post
       </Button>
     </View>
@@ -656,4 +720,4 @@ const styles = StyleSheet.create({
   postCard: {
     width: '100%',
   },
-}); 
+});

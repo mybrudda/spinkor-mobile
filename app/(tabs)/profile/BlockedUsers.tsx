@@ -7,8 +7,6 @@ import Header from '../../../components/layout/Header';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import ProfileImage from '../../../components/ui/ProfileImage';
 
-
-
 interface BlockedUser {
   id: string;
   username: string;
@@ -34,7 +32,9 @@ export default function BlockedUsers() {
 
   const fetchBlockedUsers = async () => {
     try {
-      const { data: { user } } = await supabase.auth.getUser();
+      const {
+        data: { user },
+      } = await supabase.auth.getUser();
       if (!user) {
         Alert.alert('Error', 'You must be logged in to view blocked users');
         return;
@@ -42,7 +42,8 @@ export default function BlockedUsers() {
 
       const { data, error } = await supabase
         .from('blocked_users')
-        .select(`
+        .select(
+          `
           blocked_id,
           blocked_user:blocked_id (
             id,
@@ -51,13 +52,14 @@ export default function BlockedUsers() {
             profile_image_id,
             is_verified
           )
-        `)
+        `
+        )
         .eq('blocker_id', user.id);
 
       if (error) throw error;
 
       const typedData = data as unknown as BlockedUserResponse[];
-      const blockedUsers = typedData.map(item => item.blocked_user);
+      const blockedUsers = typedData.map((item) => item.blocked_user);
       setBlockedUsers(blockedUsers);
     } catch (error) {
       console.error('Error fetching blocked users:', error);
@@ -69,7 +71,9 @@ export default function BlockedUsers() {
 
   const handleUnblock = async (userId: string) => {
     try {
-      const { data: { user } } = await supabase.auth.getUser();
+      const {
+        data: { user },
+      } = await supabase.auth.getUser();
       if (!user) {
         Alert.alert('Error', 'You must be logged in to unblock users');
         return;
@@ -84,7 +88,7 @@ export default function BlockedUsers() {
       if (error) throw error;
 
       // Update local state
-      setBlockedUsers(prev => prev.filter(user => user.id !== userId));
+      setBlockedUsers((prev) => prev.filter((user) => user.id !== userId));
       // Refresh blocked users in the hook
       await refreshBlockedUsers();
 
@@ -98,11 +102,7 @@ export default function BlockedUsers() {
   const renderBlockedUser = ({ item }: { item: BlockedUser }) => (
     <View style={[styles.userCard, { backgroundColor: theme.colors.surface }]}>
       <View style={styles.userInfo}>
-        <ProfileImage
-          imageId={item.profile_image_id}
-          size={40}
-          folder="avatars"
-        />
+        <ProfileImage imageId={item.profile_image_id} size={40} folder="avatars" />
         <View style={styles.userDetails}>
           <View style={styles.nameRow}>
             <Text variant="titleMedium" style={{ color: theme.colors.onSurface }}>
@@ -144,8 +144,8 @@ export default function BlockedUsers() {
 
   return (
     <View style={[styles.container, { backgroundColor: theme.colors.background }]}>
-      <Header 
-        title="Blocked Users" 
+      <Header
+        title="Blocked Users"
         rightElement={
           <IconButton
             icon="refresh"
@@ -162,10 +162,14 @@ export default function BlockedUsers() {
             size={48}
             color={theme.colors.onSurfaceVariant}
           />
-          <Text variant="titleMedium" style={{ color: theme.colors.onSurfaceVariant, marginTop: 16 }}>
+          <Text
+            variant="titleMedium"
+            style={{ color: theme.colors.onSurfaceVariant, marginTop: 16 }}>
             No blocked users
           </Text>
-          <Text variant="bodyMedium" style={{ color: theme.colors.onSurfaceVariant, textAlign: 'center', marginTop: 8 }}>
+          <Text
+            variant="bodyMedium"
+            style={{ color: theme.colors.onSurfaceVariant, textAlign: 'center', marginTop: 8 }}>
             Users you block won't be able to message you or see your profile
           </Text>
         </View>
@@ -173,7 +177,7 @@ export default function BlockedUsers() {
         <FlatList
           data={blockedUsers}
           renderItem={renderBlockedUser}
-          keyExtractor={item => item.id}
+          keyExtractor={(item) => item.id}
           contentContainerStyle={styles.listContent}
         />
       )}
@@ -223,4 +227,4 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     padding: 16,
   },
-}); 
+});

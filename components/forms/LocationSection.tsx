@@ -25,10 +25,12 @@ export default function LocationSection({
 
   return (
     <View style={styles.container}>
-      <Text variant="titleMedium" style={styles.sectionTitle}>Location</Text>
-      
+      <Text variant="titleMedium" style={styles.sectionTitle}>
+        Location
+      </Text>
+
       <DropdownComponent
-        data={cities.map(city => ({ label: city, value: city }))}
+        data={cities.map((city) => ({ label: city, value: city }))}
         value={location.city}
         onChange={(value: string | null) => onLocationChange('city', value || '')}
         placeholder="City"
@@ -38,7 +40,7 @@ export default function LocationSection({
       <TextInput
         label="Address (Optional)"
         value={location.address || ''}
-        onChangeText={text => onLocationChange('address', text)}
+        onChangeText={(text) => onLocationChange('address', text)}
         style={styles.input}
       />
     </View>
@@ -56,4 +58,4 @@ const styles = StyleSheet.create({
   input: {
     marginBottom: 4,
   },
-}); 
+});

@@ -40,11 +40,10 @@ export default function CategorySelector({
       <Text variant="titleMedium" style={[styles.title, { color: theme.colors.onSurface }]}>
         Select Category
       </Text>
-      <ScrollView 
-        horizontal 
+      <ScrollView
+        horizontal
         showsHorizontalScrollIndicator={false}
-        contentContainerStyle={styles.scrollContent}
-      >
+        contentContainerStyle={styles.scrollContent}>
         {CATEGORY_OPTIONS.map((option) => {
           const isSelected = selectedCategory === option.value;
           const iconName = CATEGORY_ICONS[option.value as CategoryValue];
@@ -53,8 +52,7 @@ export default function CategorySelector({
             <TouchableOpacity
               key={option.value}
               onPress={() => onSelectCategory(option.value as CategoryValue)}
-              activeOpacity={0.7}
-            >
+              activeOpacity={0.7}>
               <Card
                 mode="elevated"
                 style={[
@@ -63,13 +61,10 @@ export default function CategorySelector({
                     backgroundColor: isSelected
                       ? theme.colors.primaryContainer
                       : theme.colors.surfaceVariant,
-                    borderColor: isSelected
-                      ? theme.colors.primary
-                      : theme.colors.outline,
+                    borderColor: isSelected ? theme.colors.primary : theme.colors.outline,
                     borderWidth: isSelected ? 2 : 1,
                   },
-                ]}
-              >
+                ]}>
                 <Card.Content style={styles.cardContent}>
                   <View
                     style={[
@@ -79,8 +74,7 @@ export default function CategorySelector({
                           ? theme.colors.primary
                           : theme.colors.secondaryContainer,
                       },
-                    ]}
-                  >
+                    ]}>
                     <MaterialCommunityIcons
                       name={iconName as any}
                       size={32}
@@ -98,8 +92,7 @@ export default function CategorySelector({
                         fontWeight: isSelected ? '600' : '400',
                       },
                     ]}
-                    numberOfLines={2}
-                  >
+                    numberOfLines={2}>
                     {formatCategoryLabel(option.value)}
                   </Text>
                 </Card.Content>
@@ -156,4 +149,3 @@ const styles = StyleSheet.create({
     marginTop: 8,
   },
 });
-

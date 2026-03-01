@@ -34,19 +34,21 @@ export default function Login() {
 
   return (
     <View style={[styles.container, { backgroundColor: theme.colors.background }]}>
-      <KeyboardAvoidingView 
+      <KeyboardAvoidingView
         behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-        style={{ flex: 1 }}
-      >
-        <ScrollView 
-          contentContainerStyle={{ flexGrow: 1 }}
-          keyboardShouldPersistTaps="handled"
-        >
+        style={{ flex: 1 }}>
+        <ScrollView contentContainerStyle={{ flexGrow: 1 }} keyboardShouldPersistTaps="handled">
           <View style={{ padding: 20, flex: 1, justifyContent: 'center' }}>
             <Text variant="headlineMedium" style={{ marginBottom: 24, textAlign: 'center' }}>
               Welcome to Spinkor
             </Text>
-            <Text variant="bodyMedium" style={{ marginBottom: 32, textAlign: 'center', color: theme.colors.onSurfaceVariant }}>
+            <Text
+              variant="bodyMedium"
+              style={{
+                marginBottom: 32,
+                textAlign: 'center',
+                color: theme.colors.onSurfaceVariant,
+              }}>
               Sign in to access all features or continue as a guest
             </Text>
 
@@ -55,7 +57,7 @@ export default function Login() {
                 {error}
               </HelperText>
             ) : null}
-            
+
             <TextInput
               mode="outlined"
               label="Email"
@@ -88,30 +90,33 @@ export default function Login() {
               onPress={handleLogin}
               style={{ marginBottom: 16 }}
               loading={loading}
-              disabled={loading}
-            >
+              disabled={loading}>
               Login
             </Button>
 
-            <View style={{ flexDirection: 'row', justifyContent: 'center', alignItems: 'center', marginBottom: 16 }}>
+            <View
+              style={{
+                flexDirection: 'row',
+                justifyContent: 'center',
+                alignItems: 'center',
+                marginBottom: 16,
+              }}>
               <Text variant="bodyMedium">Don't have an account? </Text>
-              <Button 
-                mode="text" 
-                compact 
+              <Button
+                mode="text"
+                compact
                 onPress={() => router.replace('/(auth)/register')}
-                disabled={loading}
-              >
+                disabled={loading}>
                 Register
               </Button>
             </View>
 
             <View style={{ flexDirection: 'row', justifyContent: 'center', marginBottom: 24 }}>
-              <Button 
-                mode="text" 
-                compact 
+              <Button
+                mode="text"
+                compact
                 onPress={() => router.replace('/(auth)/forgotPassword')}
-                disabled={loading}
-              >
+                disabled={loading}>
                 Forgot Password?
               </Button>
             </View>
@@ -122,11 +127,12 @@ export default function Login() {
               mode="outlined"
               onPress={handleSkip}
               disabled={loading}
-              style={{ marginBottom: 8 }}
-            >
+              style={{ marginBottom: 8 }}>
               Continue as Guest
             </Button>
-            <Text variant="bodySmall" style={{ textAlign: 'center', color: theme.colors.onSurfaceVariant }}>
+            <Text
+              variant="bodySmall"
+              style={{ textAlign: 'center', color: theme.colors.onSurfaceVariant }}>
               Some features will be limited without an account
             </Text>
           </View>
@@ -142,4 +148,4 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     padding: 16,
   },
-}); 
+});

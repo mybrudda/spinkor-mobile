@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useRef, useCallback, memo, useMemo } from "react";
+import React, { useEffect, useState, useRef, useCallback, memo, useMemo } from 'react';
 import {
   View,
   StyleSheet,
@@ -11,25 +11,25 @@ import {
   Alert,
   RefreshControl,
   Keyboard,
-} from "react-native";
-import { useTheme, Text, Menu } from "react-native-paper";
-import { useLocalSearchParams, router } from "expo-router";
-import { ChatMessage } from "../components/chat/ChatMessage";
+} from 'react-native';
+import { useTheme, Text, Menu } from 'react-native-paper';
+import { useLocalSearchParams, router } from 'expo-router';
+import { ChatMessage } from '../components/chat/ChatMessage';
 
-import { ChatInput } from "../components/chat/ChatInput";
-import { UserInfoModal } from "../components/chat/UserInfoModal";
-import { chatService } from "../lib/chatService";
-import { Message, Conversation } from "../types/chat";
-import { GroupedMessage, groupMessages, formatDateSeparator } from "../utils/messageUtils";
-import { supabase } from "../supabaseClient";
-import Header from "../components/layout/Header";
-import { MaterialCommunityIcons } from "@expo/vector-icons";
-import { useUnreadMessagesStore } from "../store/useUnreadMessagesStore";
+import { ChatInput } from '../components/chat/ChatInput';
+import { UserInfoModal } from '../components/chat/UserInfoModal';
+import { chatService } from '../lib/chatService';
+import { Message, Conversation } from '../types/chat';
+import { GroupedMessage, groupMessages, formatDateSeparator } from '../utils/messageUtils';
+import { supabase } from '../supabaseClient';
+import Header from '../components/layout/Header';
+import { MaterialCommunityIcons } from '@expo/vector-icons';
+import { useUnreadMessagesStore } from '../store/useUnreadMessagesStore';
 import { useBlockedUsers } from '../lib/hooks/useBlockedUsers';
 import { formatPrice } from '../utils/format';
 import { getCloudinaryUrl } from '../lib/cloudinary';
-import { Image as ExpoImage } from "expo-image";
-import ProfileImage from "../components/ui/ProfileImage";
+import { Image as ExpoImage } from 'expo-image';
+import ProfileImage from '../components/ui/ProfileImage';
 
 import { PLACEHOLDER_BLURHASH } from '@/constants/images';
 const MemoizedChatMessage = memo(ChatMessage);
@@ -37,7 +37,7 @@ const MemoizedChatMessage = memo(ChatMessage);
 export default function ChatRoom() {
   const theme = useTheme();
   const params = useLocalSearchParams();
-  
+
   // Navigation params
   const conversationId = params.id as string;
   const conversationParam = params.conversation as string;
@@ -52,7 +52,7 @@ export default function ChatRoom() {
 
   // State
   const [messages, setMessages] = useState<Message[]>([]);
-  const [newMessage, setNewMessage] = useState("");
+  const [newMessage, setNewMessage] = useState('');
   const [loading, setLoading] = useState(true);
   const [currentUser, setCurrentUser] = useState<any>(null);
   const [conversation, setConversation] = useState<Conversation | null>(null);
@@ -104,7 +104,7 @@ export default function ChatRoom() {
         other_user_is_verified: false,
         other_user_type: 'person',
         last_message: null,
-        unread_count: 0
+        unread_count: 0,
       };
       setConversation(tempConversation);
     } else if (conversationParam) {
@@ -117,14 +117,26 @@ export default function ChatRoom() {
         Alert.alert('Error', 'Invalid conversation data');
       }
     }
-  }, [isNewConversation, conversationParam, postId, sellerId, sellerName, sellerAvatar, postTitle, postImage, postPrice]);
+  }, [
+    isNewConversation,
+    conversationParam,
+    postId,
+    sellerId,
+    sellerName,
+    sellerAvatar,
+    postTitle,
+    postImage,
+    postPrice,
+  ]);
 
   // Load current user and initial data
   useEffect(() => {
     const initializeChat = async () => {
       try {
         // Get current user
-        const { data: { user } } = await supabase.auth.getUser();
+        const {
+          data: { user },
+        } = await supabase.auth.getUser();
         if (!user) {
           Alert.alert('Error', 'Please sign in to continue');
           return;
@@ -135,7 +147,7 @@ export default function ChatRoom() {
           // For new conversations, just set loading to false
           setLoading(false);
           setHasMoreMessages(false);
-          
+
           // Scroll to bottom for new conversations
           setTimeout(() => {
             flatListRef.current?.scrollToEnd({ animated: false });
@@ -162,12 +174,12 @@ export default function ChatRoom() {
     try {
       const messagesData = await chatService.getMessages(convId, INITIAL_MESSAGES_COUNT);
       setMessages(messagesData);
-      
+
       if (messagesData.length > 0) {
         setOldestMessageTimestamp(messagesData[0].created_at);
         setHasMoreMessages(messagesData.length === INITIAL_MESSAGES_COUNT);
       }
-      
+
       // Mark messages as read when entering the chat
       await chatService.markMessagesAsRead(convId);
 
@@ -184,11 +196,11 @@ export default function ChatRoom() {
   const checkUserPermissions = async (userId: string, conv: Conversation) => {
     try {
       const otherUserId = conv.creator_id === userId ? conv.participant_id : conv.creator_id;
-      
+
       // Check if user is blocked
       const blocked = await isUserBlocked(otherUserId);
       setIsBlocked(blocked);
-      
+
       // Check if user can message
       const canMessage = await canMessageUser(otherUserId);
       setCanSendMessages(canMessage);
@@ -199,7 +211,8 @@ export default function ChatRoom() {
 
   // Load older messages for pagination
   const loadOlderMessages = async () => {
-    if (!conversation || isLoadingOlderMessages || !hasMoreMessages || !oldestMessageTimestamp) return;
+    if (!conversation || isLoadingOlderMessages || !hasMoreMessages || !oldestMessageTimestamp)
+      return;
 
     setIsLoadingOlderMessages(true);
     try {
@@ -210,7 +223,7 @@ export default function ChatRoom() {
       );
 
       if (olderMessages.length > 0) {
-        setMessages(prev => [...olderMessages, ...prev]);
+        setMessages((prev) => [...olderMessages, ...prev]);
         setOldestMessageTimestamp(olderMessages[0].created_at);
         setHasMoreMessages(olderMessages.length === MESSAGES_PER_PAGE);
       } else {
@@ -235,7 +248,7 @@ export default function ChatRoom() {
       try {
         const newConversation = await chatService.createConversation(postId, sellerId);
         actualConversationId = newConversation.id;
-        
+
         // Update conversation state with real data
         const updatedConversation: Conversation = {
           ...conversation,
@@ -264,14 +277,14 @@ export default function ChatRoom() {
       sender: {
         id: currentUser?.id,
         username: currentUser?.username || currentUser?.email,
-        profile_image_id: currentUser?.profile_image_id
+        profile_image_id: currentUser?.profile_image_id,
       },
     };
 
     // Clear input and add temporary message
-    setNewMessage("");
+    setNewMessage('');
     setSendingMessage(true);
-    setMessages(prev => [...prev, tempMessage]);
+    setMessages((prev) => [...prev, tempMessage]);
 
     // Scroll to bottom to show the new message
     setTimeout(() => {
@@ -280,17 +293,17 @@ export default function ChatRoom() {
 
     // Cleanup timeout for temporary message
     const cleanupTimeout = setTimeout(() => {
-      setMessages(prev => prev.filter(msg => msg.id !== tempMessageId));
+      setMessages((prev) => prev.filter((msg) => msg.id !== tempMessageId));
     }, 10000);
 
     try {
       // Send the actual message
       const sentMessage = await chatService.sendMessage(actualConversationId, messageContent);
-      
+
       // Clear timeout and replace temporary message
       clearTimeout(cleanupTimeout);
-      setMessages(prev => {
-        const withoutTemp = prev.filter(msg => msg.id !== tempMessageId);
+      setMessages((prev) => {
+        const withoutTemp = prev.filter((msg) => msg.id !== tempMessageId);
         return [...withoutTemp, sentMessage];
       });
 
@@ -298,11 +311,10 @@ export default function ChatRoom() {
       setTimeout(() => {
         flatListRef.current?.scrollToEnd({ animated: true });
       }, 100);
-
     } catch (error) {
       clearTimeout(cleanupTimeout);
       console.error('Error sending message:', error);
-      setFailedMessages(prev => new Set(prev).add(tempMessageId));
+      setFailedMessages((prev) => new Set(prev).add(tempMessageId));
       setNewMessage(messageContent);
       Alert.alert('Error', 'Failed to send message. Tap the message to retry.');
     } finally {
@@ -311,35 +323,36 @@ export default function ChatRoom() {
   }, [newMessage, conversation, currentUser, sendingMessage, isNewConversation, postId, sellerId]);
 
   // Retry failed message
-  const handleRetryMessage = useCallback(async (failedMessage: Message) => {
-    if (!conversation || sendingMessage) return;
+  const handleRetryMessage = useCallback(
+    async (failedMessage: Message) => {
+      if (!conversation || sendingMessage) return;
 
-    try {
-      setFailedMessages(prev => {
-        const newSet = new Set(prev);
-        newSet.delete(failedMessage.id);
-        return newSet;
-      });
+      try {
+        setFailedMessages((prev) => {
+          const newSet = new Set(prev);
+          newSet.delete(failedMessage.id);
+          return newSet;
+        });
 
-      setSendingMessage(true);
-      const sentMessage = await chatService.sendMessage(conversation.id, failedMessage.content);
-      
-      setMessages(prev => prev.map(msg => 
-        msg.id === failedMessage.id ? sentMessage : msg
-      ));
+        setSendingMessage(true);
+        const sentMessage = await chatService.sendMessage(conversation.id, failedMessage.content);
 
-      // Scroll to bottom to show the retried message
-      setTimeout(() => {
-        flatListRef.current?.scrollToEnd({ animated: true });
-      }, 100);
-    } catch (error) {
-      console.error('Error retrying message:', error);
-      setFailedMessages(prev => new Set(prev).add(failedMessage.id));
-      Alert.alert('Error', 'Failed to send message. Please try again.');
-    } finally {
-      setSendingMessage(false);
-    }
-  }, [conversation, sendingMessage]);
+        setMessages((prev) => prev.map((msg) => (msg.id === failedMessage.id ? sentMessage : msg)));
+
+        // Scroll to bottom to show the retried message
+        setTimeout(() => {
+          flatListRef.current?.scrollToEnd({ animated: true });
+        }, 100);
+      } catch (error) {
+        console.error('Error retrying message:', error);
+        setFailedMessages((prev) => new Set(prev).add(failedMessage.id));
+        Alert.alert('Error', 'Failed to send message. Please try again.');
+      } finally {
+        setSendingMessage(false);
+      }
+    },
+    [conversation, sendingMessage]
+  );
 
   // Block/Unblock user
   const handleBlock = useCallback(async () => {
@@ -347,16 +360,15 @@ export default function ChatRoom() {
 
     setBlockingLoading(true);
     try {
-      const otherUserId = conversation.creator_id === currentUser.id 
-        ? conversation.participant_id 
-        : conversation.creator_id;
+      const otherUserId =
+        conversation.creator_id === currentUser.id
+          ? conversation.participant_id
+          : conversation.creator_id;
 
-      await supabase
-        .from('blocked_users')
-        .insert({
-          blocker_id: currentUser.id,
-          blocked_id: otherUserId
-        });
+      await supabase.from('blocked_users').insert({
+        blocker_id: currentUser.id,
+        blocked_id: otherUserId,
+      });
 
       setIsBlocked(true);
       await refreshBlockedUsers();
@@ -374,9 +386,10 @@ export default function ChatRoom() {
 
     setBlockingLoading(true);
     try {
-      const otherUserId = conversation.creator_id === currentUser.id 
-        ? conversation.participant_id 
-        : conversation.creator_id;
+      const otherUserId =
+        conversation.creator_id === currentUser.id
+          ? conversation.participant_id
+          : conversation.creator_id;
 
       await supabase
         .from('blocked_users')
@@ -395,8 +408,6 @@ export default function ChatRoom() {
     }
   }, [conversation, currentUser, blockingLoading, refreshBlockedUsers]);
 
-
-
   // Realtime subscription for messages
   useEffect(() => {
     if (!conversation || conversation.id.startsWith('temp-')) return;
@@ -413,14 +424,14 @@ export default function ChatRoom() {
         },
         (payload) => {
           const newMessage = payload.new as Message;
-          
+
           // Don't add if it's our own message (already added optimistically)
           if (newMessage.sender_id !== currentUser?.id) {
-            setMessages(prev => [...prev, newMessage]);
-            
+            setMessages((prev) => [...prev, newMessage]);
+
             // Mark the new message as read immediately if user is viewing the chat
             chatService.markMessagesAsRead(conversation.id).catch(console.error);
-            
+
             // Auto-scroll to bottom for new incoming messages
             setTimeout(() => {
               flatListRef.current?.scrollToEnd({ animated: true });
@@ -438,14 +449,10 @@ export default function ChatRoom() {
         },
         (payload) => {
           const updatedMessage = payload.new as Message;
-          
+
           // Update the message in our state (for read status changes)
-          setMessages(prev => 
-            prev.map(msg => 
-              msg.id === updatedMessage.id 
-                ? { ...msg, ...updatedMessage }
-                : msg
-            )
+          setMessages((prev) =>
+            prev.map((msg) => (msg.id === updatedMessage.id ? { ...msg, ...updatedMessage } : msg))
           );
         }
       )
@@ -456,25 +463,19 @@ export default function ChatRoom() {
     };
   }, [conversation?.id, currentUser?.id]);
 
-
-
   // Clear unread count when entering chat and set up periodic read status updates
   useEffect(() => {
     if (conversation && !conversation.id.startsWith('temp-')) {
       clearUnreadCount(conversation.id);
-      
+
       // Mark messages as read periodically while user is viewing the chat
       const interval = setInterval(() => {
         chatService.markMessagesAsRead(conversation.id).catch(console.error);
       }, 5000); // Every 5 seconds
-      
+
       return () => clearInterval(interval);
     }
   }, [conversation?.id, clearUnreadCount]);
-
-
-
-
 
   // Memoized data
   const memoizedMessages = useMemo(() => {
@@ -497,33 +498,38 @@ export default function ChatRoom() {
     };
   }, [memoizedMessages.length]);
 
-  const renderMessage = useCallback(({ item }: { item: GroupedMessage }) => {
-    if (item.type === 'date-separator') {
-      return (
-        <View style={styles.dateSeparator}>
-          <Text variant="labelSmall" style={[styles.dateText, { color: theme.colors.onSurfaceVariant }]}>
-            {formatDateSeparator((item.data as { date: string }).date)}
-          </Text>
-        </View>
-      );
-    }
+  const renderMessage = useCallback(
+    ({ item }: { item: GroupedMessage }) => {
+      if (item.type === 'date-separator') {
+        return (
+          <View style={styles.dateSeparator}>
+            <Text
+              variant="labelSmall"
+              style={[styles.dateText, { color: theme.colors.onSurfaceVariant }]}>
+              {formatDateSeparator((item.data as { date: string }).date)}
+            </Text>
+          </View>
+        );
+      }
 
-    const message = item.data as Message;
-    const isOwnMessage = message.sender_id === currentUser?.id;
-    const hasFailed = failedMessages.has(message.id);
-    
-    return (
-      <ChatMessage
-        message={message}
-        isOwnMessage={isOwnMessage}
-        hasFailed={hasFailed}
-        onRetry={() => hasFailed ? handleRetryMessage(message) : undefined}
-        onLongPress={() => console.log('Long pressed message:', message.id)}
-        isFirstInGroup={item.isFirstInGroup}
-        isLastInGroup={item.isLastInGroup}
-      />
-    );
-  }, [currentUser?.id, failedMessages, handleRetryMessage, theme.colors.onSurfaceVariant]);
+      const message = item.data as Message;
+      const isOwnMessage = message.sender_id === currentUser?.id;
+      const hasFailed = failedMessages.has(message.id);
+
+      return (
+        <ChatMessage
+          message={message}
+          isOwnMessage={isOwnMessage}
+          hasFailed={hasFailed}
+          onRetry={() => (hasFailed ? handleRetryMessage(message) : undefined)}
+          onLongPress={() => console.log('Long pressed message:', message.id)}
+          isFirstInGroup={item.isFirstInGroup}
+          isLastInGroup={item.isLastInGroup}
+        />
+      );
+    },
+    [currentUser?.id, failedMessages, handleRetryMessage, theme.colors.onSurfaceVariant]
+  );
 
   const keyExtractor = useCallback((item: GroupedMessage) => {
     if (item.type === 'date-separator') {
@@ -532,13 +538,14 @@ export default function ChatRoom() {
     return (item.data as Message).id;
   }, []);
 
-  const getItemLayout = useCallback((data: any, index: number) => ({
-    length: 60,
-    offset: 60 * index,
-    index,
-  }), []);
-
-
+  const getItemLayout = useCallback(
+    (data: any, index: number) => ({
+      length: 60,
+      offset: 60 * index,
+      index,
+    }),
+    []
+  );
 
   if (loading) {
     return (
@@ -546,10 +553,9 @@ export default function ChatRoom() {
         <Header title="Chat" />
         <View style={styles.loadingContent}>
           <ActivityIndicator size="large" color={theme.colors.primary} />
-          <Text 
-            variant="bodyMedium" 
-            style={[styles.loadingText, { color: theme.colors.onSurfaceVariant }]}
-          >
+          <Text
+            variant="bodyMedium"
+            style={[styles.loadingText, { color: theme.colors.onSurfaceVariant }]}>
             Loading conversation...
           </Text>
         </View>
@@ -569,18 +575,14 @@ export default function ChatRoom() {
   return (
     <View style={[styles.container, { backgroundColor: theme.colors.background }]}>
       <KeyboardAvoidingView
-         behavior={Platform.OS === "ios" ? "padding" : "height"}
-         style={{ flex: 1 }}
-         keyboardVerticalOffset={Platform.OS === "ios" ? 0 : 20}
-      >
+        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+        style={{ flex: 1 }}
+        keyboardVerticalOffset={Platform.OS === 'ios' ? 0 : 20}>
         <Header
-          title={conversation.other_user_name || "Chat"}
+          title={conversation.other_user_name || 'Chat'}
           rightElement={
             <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-              <TouchableOpacity
-                style={styles.menuButton}
-                onPress={() => setShowUserInfo(true)}
-              >
+              <TouchableOpacity style={styles.menuButton} onPress={() => setShowUserInfo(true)}>
                 <MaterialCommunityIcons
                   name="account-circle"
                   size={24}
@@ -591,18 +593,14 @@ export default function ChatRoom() {
                 visible={menuVisible}
                 onDismiss={() => setMenuVisible(false)}
                 anchor={
-                  <TouchableOpacity
-                    style={styles.menuButton}
-                    onPress={() => setMenuVisible(true)}
-                  >
+                  <TouchableOpacity style={styles.menuButton} onPress={() => setMenuVisible(true)}>
                     <MaterialCommunityIcons
                       name="dots-vertical"
                       size={24}
                       color={theme.colors.onSurface}
                     />
                   </TouchableOpacity>
-                }
-              >
+                }>
                 {isBlocked ? (
                   <Menu.Item
                     onPress={() => {
@@ -628,15 +626,16 @@ export default function ChatRoom() {
             </View>
           }
         />
-        
+
         {conversation?.post_title && (
           <View style={styles.postInfoContainer}>
             <ExpoImage
-              source={{ uri: conversation?.post_image ? getCloudinaryUrl(conversation.post_image, 'posts') || '' : '' }}
-              style={[
-                styles.postImage,
-                conversation?.post_status !== 'active' && { opacity: 0.5 }
-              ]}
+              source={{
+                uri: conversation?.post_image
+                  ? getCloudinaryUrl(conversation.post_image, 'posts') || ''
+                  : '',
+              }}
+              style={[styles.postImage, conversation?.post_status !== 'active' && { opacity: 0.5 }]}
               contentFit="cover"
               transition={300}
               placeholder={PLACEHOLDER_BLURHASH}
@@ -647,8 +646,7 @@ export default function ChatRoom() {
                 variant="bodyMedium"
                 style={{ color: theme.colors.onSurface }}
                 numberOfLines={1}
-                ellipsizeMode="tail"
-              >
+                ellipsizeMode="tail">
                 {conversation?.post_title}
               </Text>
               <Text variant="labelLarge" style={{ color: theme.colors.primary }}>
@@ -657,18 +655,17 @@ export default function ChatRoom() {
               {conversation?.post_status !== 'active' && (
                 <Text
                   variant="bodySmall"
-                  style={{ 
+                  style={{
                     color: theme.colors.error,
-                    fontStyle: 'italic'
-                  }}
-                >
+                    fontStyle: 'italic',
+                  }}>
                   This post is no longer available
                 </Text>
               )}
             </View>
           </View>
         )}
-        
+
         <FlatList
           ref={flatListRef}
           data={memoizedMessages}
@@ -712,7 +709,7 @@ export default function ChatRoom() {
             />
           }
         />
-        
+
         {!isBlocked && canSendMessages && (
           <ChatInput
             value={newMessage}
@@ -725,7 +722,7 @@ export default function ChatRoom() {
             maxLength={1000}
           />
         )}
-        
+
         {(isBlocked || !canSendMessages) && (
           <View
             style={[
@@ -734,8 +731,7 @@ export default function ChatRoom() {
                 backgroundColor: theme.colors.surface,
                 borderTopColor: theme.colors.surfaceVariant,
               },
-            ]}
-          >
+            ]}>
             <Text
               variant="bodyMedium"
               style={{
@@ -743,12 +739,10 @@ export default function ChatRoom() {
                 textAlign: 'center',
                 fontStyle: 'italic',
                 paddingVertical: 20,
-              }}
-            >
-              {isBlocked 
-                ? "You have blocked this user. You can view the conversation but cannot send new messages."
-                : "You cannot send messages to this user."
-              }
+              }}>
+              {isBlocked
+                ? 'You have blocked this user. You can view the conversation but cannot send new messages.'
+                : 'You cannot send messages to this user.'}
             </Text>
           </View>
         )}
@@ -770,13 +764,13 @@ const styles = StyleSheet.create({
   },
   loadingContent: {
     flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
+    justifyContent: 'center',
+    alignItems: 'center',
     marginBottom: 60, // Space above the header
   },
   loadingText: {
     marginTop: 16,
-    textAlign: "center",
+    textAlign: 'center',
   },
   container: {
     flex: 1,
@@ -789,8 +783,8 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
   },
   postInfoContainer: {
-    flexDirection: "row",
-    alignItems: "center",
+    flexDirection: 'row',
+    alignItems: 'center',
     paddingVertical: 8,
     paddingHorizontal: 16,
     backgroundColor: 'transparent',

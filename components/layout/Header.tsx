@@ -23,31 +23,24 @@ export default function Header({ title, onBackPress, rightElement }: HeaderProps
   return (
     <View style={[styles.container, { backgroundColor: theme.colors.background }]}>
       <View style={styles.content}>
-        <Pressable 
+        <Pressable
           onPress={handleBackPress}
-          style={({ pressed }) => [
-            styles.backButton,
-            pressed && { opacity: 0.7 }
-          ]}
-        >
-          <MaterialCommunityIcons 
-            name="arrow-left" 
-            size={24} 
-            color={theme.colors.onSecondaryContainer} 
+          style={({ pressed }) => [styles.backButton, pressed && { opacity: 0.7 }]}>
+          <MaterialCommunityIcons
+            name="arrow-left"
+            size={24}
+            color={theme.colors.onSecondaryContainer}
           />
         </Pressable>
 
-        <Text 
-          variant="titleLarge" 
+        <Text
+          variant="titleLarge"
           style={[styles.title, { color: theme.colors.onSecondaryContainer }]}
-          numberOfLines={1}
-        >
+          numberOfLines={1}>
           {title}
         </Text>
 
-        <View style={styles.rightContainer}>
-          {rightElement}
-        </View>
+        <View style={styles.rightContainer}>{rightElement}</View>
       </View>
     </View>
   );
@@ -87,4 +80,4 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
   },
-}); 
+});

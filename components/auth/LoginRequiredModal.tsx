@@ -21,7 +21,7 @@ export default function LoginRequiredModal({
 
   const getTitle = () => {
     if (customTitle) return customTitle;
-    
+
     switch (action) {
       case 'message':
         return 'Login Required';
@@ -36,7 +36,7 @@ export default function LoginRequiredModal({
 
   const getMessage = () => {
     if (customMessage) return customMessage;
-    
+
     switch (action) {
       case 'message':
         return 'You need to be logged in to message sellers.';
@@ -58,11 +58,8 @@ export default function LoginRequiredModal({
     <Dialog
       visible={visible}
       onDismiss={onDismiss}
-      style={{ backgroundColor: theme.colors.surface }}
-    >
-      <Dialog.Title style={{ color: theme.colors.onSurface }}>
-        {getTitle()}
-      </Dialog.Title>
+      style={{ backgroundColor: theme.colors.surface }}>
+      <Dialog.Title style={{ color: theme.colors.onSurface }}>{getTitle()}</Dialog.Title>
       <Dialog.Content>
         <Text variant="bodyMedium" style={{ color: theme.colors.onSurface }}>
           {getMessage()}
@@ -75,4 +72,3 @@ export default function LoginRequiredModal({
     </Dialog>
   );
 }
-

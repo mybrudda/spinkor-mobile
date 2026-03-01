@@ -53,4 +53,3 @@ export async function setOnboardingCompleted(): Promise<void> {
     console.error('Error setting onboarding completed:', error);
   }
 }
-

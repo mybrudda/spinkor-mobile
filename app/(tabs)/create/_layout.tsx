@@ -7,21 +7,20 @@ export default function CreateLayout() {
   return (
     <Stack
       screenOptions={{
-        headerShown: false
-      }}
-    >
+        headerShown: false,
+      }}>
       <Stack.Screen
         name="index"
         options={{
-          headerShown: false
+          headerShown: false,
         }}
       />
       <Stack.Screen
         name="create-post"
         options={{
-          headerShown: false
+          headerShown: false,
         }}
       />
     </Stack>
   );
-} 
+}

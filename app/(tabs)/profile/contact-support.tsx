@@ -15,29 +15,16 @@ export default function ContactSupportScreen() {
     <View style={[styles.container, { backgroundColor: theme.colors.background }]}>
       <Header title="Contact Support" />
       <View style={styles.content}>
-        <MaterialCommunityIcons
-          name="headset"
-          size={64}
-          color={theme.colors.onSurfaceVariant}
-        />
-        <Text
-          variant="headlineSmall"
-          style={[styles.title, { color: theme.colors.onSurface }]}
-        >
+        <MaterialCommunityIcons name="headset" size={64} color={theme.colors.onSurfaceVariant} />
+        <Text variant="headlineSmall" style={[styles.title, { color: theme.colors.onSurface }]}>
           Contact Support
         </Text>
         <Text
           variant="bodyLarge"
-          style={[styles.subtitle, { color: theme.colors.onSurfaceVariant }]}
-        >
+          style={[styles.subtitle, { color: theme.colors.onSurfaceVariant }]}>
           Need help? Our support team is here for you.
         </Text>
-        <Button
-          mode="contained"
-          onPress={handleEmailSupport}
-          style={styles.button}
-          icon="email"
-        >
+        <Button mode="contained" onPress={handleEmailSupport} style={styles.button} icon="email">
           Email Support
         </Button>
       </View>
@@ -67,4 +54,4 @@ const styles = StyleSheet.create({
   button: {
     marginTop: 16,
   },
-}); 
+});

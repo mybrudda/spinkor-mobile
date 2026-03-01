@@ -1,6 +1,14 @@
 import React, { useState, useEffect } from 'react';
 import { View, StyleSheet } from 'react-native';
-import { Card, Switch, Text, Button, ActivityIndicator, useTheme, Divider } from 'react-native-paper';
+import {
+  Card,
+  Switch,
+  Text,
+  Button,
+  ActivityIndicator,
+  useTheme,
+  Divider,
+} from 'react-native-paper';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { supabase } from '../supabaseClient';
 import { useAuthStore } from '../store/useAuthStore';
@@ -76,7 +84,7 @@ export default function NotificationOptions() {
         return;
       }
 
-      setSettings(prev => prev ? { ...prev, [field]: value } : null);
+      setSettings((prev) => (prev ? { ...prev, [field]: value } : null));
     } catch (error) {
       console.error('Error updating notification setting:', error);
     } finally {
@@ -88,7 +96,9 @@ export default function NotificationOptions() {
     return (
       <View style={styles.loadingContainer}>
         <ActivityIndicator size="large" color={theme.colors.primary} />
-        <Text variant="bodyMedium" style={[styles.loadingText, { color: theme.colors.onSurfaceVariant }]}>
+        <Text
+          variant="bodyMedium"
+          style={[styles.loadingText, { color: theme.colors.onSurfaceVariant }]}>
           Loading notification options...
         </Text>
       </View>
@@ -98,8 +108,14 @@ export default function NotificationOptions() {
   if (!settings) {
     return (
       <View style={styles.errorContainer}>
-        <MaterialCommunityIcons name="alert-circle-outline" size={48} color={theme.colors.onSurfaceVariant} />
-        <Text variant="bodyMedium" style={[styles.errorText, { color: theme.colors.onSurfaceVariant }]}>
+        <MaterialCommunityIcons
+          name="alert-circle-outline"
+          size={48}
+          color={theme.colors.onSurfaceVariant}
+        />
+        <Text
+          variant="bodyMedium"
+          style={[styles.errorText, { color: theme.colors.onSurfaceVariant }]}>
           Failed to load notification options
         </Text>
         <Button onPress={loadSettings} mode="contained" style={styles.retryButton}>
@@ -116,8 +132,14 @@ export default function NotificationOptions() {
         <View style={styles.settingsContent}>
           <View style={styles.settingRow}>
             <View style={styles.settingLeftContent}>
-              <MaterialCommunityIcons name="message-text-outline" size={20} color={theme.colors.primary} />
-              <Text variant="bodyMedium" style={[styles.settingText, { color: theme.colors.onSurface }]}>
+              <MaterialCommunityIcons
+                name="message-text-outline"
+                size={20}
+                color={theme.colors.primary}
+              />
+              <Text
+                variant="bodyMedium"
+                style={[styles.settingText, { color: theme.colors.onSurface }]}>
                 Message Notifications
               </Text>
             </View>
@@ -132,8 +154,14 @@ export default function NotificationOptions() {
           <Divider />
           <View style={styles.settingRow}>
             <View style={styles.settingLeftContent}>
-              <MaterialCommunityIcons name="information-outline" size={20} color={theme.colors.onSurfaceVariant} />
-              <Text variant="bodySmall" style={[styles.settingDescription, { color: theme.colors.onSurfaceVariant }]}>
+              <MaterialCommunityIcons
+                name="information-outline"
+                size={20}
+                color={theme.colors.onSurfaceVariant}
+              />
+              <Text
+                variant="bodySmall"
+                style={[styles.settingDescription, { color: theme.colors.onSurfaceVariant }]}>
                 Receive notifications when someone sends you a message
               </Text>
             </View>
@@ -202,4 +230,4 @@ const styles = StyleSheet.create({
     marginLeft: 0,
     flex: 1,
   },
-}); 
+});

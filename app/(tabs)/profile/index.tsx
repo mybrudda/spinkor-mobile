@@ -1,17 +1,26 @@
-import React, { useEffect, useState } from "react";
-import { StyleSheet, View, Pressable, TouchableOpacity } from "react-native";
-import { useTheme, Text, IconButton, Button, Divider, ActivityIndicator, Portal, Modal } from "react-native-paper";
-import { MaterialCommunityIcons } from "@expo/vector-icons";
-import { router } from "expo-router";
-import { useAuthStore } from "../../../store/useAuthStore";
-import { useThemeStore } from "../../../store/useThemeStore";
-import { useCountryStore } from "../../../store/useCountryStore";
-import { COUNTRY_DATA, Country } from "../../../constants/CountryData";
-import LoadingScreen from "../../../components/ui/LoadingScreen";
-import { supabase } from "../../../supabaseClient";
-import LoginRequiredModal from "../../../components/auth/LoginRequiredModal";
+import React, { useEffect, useState } from 'react';
+import { StyleSheet, View, Pressable, TouchableOpacity } from 'react-native';
+import {
+  useTheme,
+  Text,
+  IconButton,
+  Button,
+  Divider,
+  ActivityIndicator,
+  Portal,
+  Modal,
+} from 'react-native-paper';
+import { MaterialCommunityIcons } from '@expo/vector-icons';
+import { router } from 'expo-router';
+import { useAuthStore } from '../../../store/useAuthStore';
+import { useThemeStore } from '../../../store/useThemeStore';
+import { useCountryStore } from '../../../store/useCountryStore';
+import { COUNTRY_DATA, Country } from '../../../constants/CountryData';
+import LoadingScreen from '../../../components/ui/LoadingScreen';
+import { supabase } from '../../../supabaseClient';
+import LoginRequiredModal from '../../../components/auth/LoginRequiredModal';
 import * as ImagePicker from 'expo-image-picker';
-import ProfileImage from "../../../components/ui/ProfileImage";
+import ProfileImage from '../../../components/ui/ProfileImage';
 
 interface UserProfile {
   id: string;
@@ -55,15 +64,9 @@ export default function ProfileScreen() {
     setTempImageUrl(null);
   }, [user]);
 
-
-
   const fetchUserProfile = async () => {
     try {
-      const { data, error } = await supabase
-        .from('users')
-        .select('*')
-        .eq('id', user!.id)
-        .single();
+      const { data, error } = await supabase.from('users').select('*').eq('id', user!.id).single();
 
       if (error) throw error;
       setUserProfile(data);
@@ -77,16 +80,16 @@ export default function ProfileScreen() {
   const handleSignOut = async () => {
     try {
       await signOut();
-      router.replace("/");
+      router.replace('/');
     } catch (error) {
-      console.error("Error signing out:", error);
+      console.error('Error signing out:', error);
     }
   };
 
   const handleImagePick = async () => {
     try {
       const result = await ImagePicker.launchImageLibraryAsync({
-        mediaTypes: "images",
+        mediaTypes: 'images',
         allowsEditing: true,
         aspect: [1, 1],
         quality: 0.5,
@@ -106,25 +109,25 @@ export default function ProfileScreen() {
 
         // Create temporary image URL for optimistic update
         const tempImageUrl = `data:image/jpeg;base64,${result.assets[0].base64}`;
-        
+
         // Store the original profile image ID for rollback
         const originalProfileImageId = userProfile?.profile_image_id || null;
-        
+
         // Set temporary image URL for optimistic display
         setTempImageUrl(tempImageUrl);
-        
+
         // Optimistic update - show new image immediately
-        setUserProfile(prev => prev ? { ...prev, profile_image_id: 'temp' } : null);
+        setUserProfile((prev) => (prev ? { ...prev, profile_image_id: 'temp' } : null));
 
         // Start upload in background
         setIsUploading(true);
-        
+
         try {
           const response = await fetch(`${supabaseUrl}/functions/v1/update-profile-image`, {
             method: 'POST',
             headers: {
               'Content-Type': 'application/json',
-              'Authorization': `Bearer ${session.access_token}`,
+              Authorization: `Bearer ${session.access_token}`,
             },
             body: JSON.stringify({
               base64Image: tempImageUrl,
@@ -137,14 +140,16 @@ export default function ProfileScreen() {
           }
 
           const { profile_image_id } = await response.json();
-          
+
           // Update with the actual profile image ID
-          setUserProfile(prev => prev ? { ...prev, profile_image_id } : null);
+          setUserProfile((prev) => (prev ? { ...prev, profile_image_id } : null));
           // Clear temporary image URL
           setTempImageUrl(null);
         } catch (error) {
           // Rollback on error - restore original profile image ID
-          setUserProfile(prev => prev ? { ...prev, profile_image_id: originalProfileImageId } : null);
+          setUserProfile((prev) =>
+            prev ? { ...prev, profile_image_id: originalProfileImageId } : null
+          );
           // Clear temporary image URL on error
           setTempImageUrl(null);
           console.error('Error updating profile image:', error);
@@ -163,204 +168,245 @@ export default function ProfileScreen() {
     return <LoadingScreen />;
   }
 
-
-
   return (
     <>
       {!user ? (
         <View style={[styles.container, { backgroundColor: theme.colors.background }]}>
           <View style={styles.emptyStateContainer}>
-            <MaterialCommunityIcons 
-              name="account-circle-outline" 
-              size={64} 
-              color={theme.colors.onSurfaceVariant} 
+            <MaterialCommunityIcons
+              name="account-circle-outline"
+              size={64}
+              color={theme.colors.onSurfaceVariant}
             />
-            <Text variant="headlineSmall" style={[styles.emptyStateTitle, { color: theme.colors.onSurface }]}>
+            <Text
+              variant="headlineSmall"
+              style={[styles.emptyStateTitle, { color: theme.colors.onSurface }]}>
               Please Login
             </Text>
-            <Text variant="bodyMedium" style={[styles.emptyStateText, { color: theme.colors.onSurfaceVariant }]}>
+            <Text
+              variant="bodyMedium"
+              style={[styles.emptyStateText, { color: theme.colors.onSurfaceVariant }]}>
               You need to be logged in to view your profile.
             </Text>
           </View>
         </View>
       ) : (
         <View style={[styles.container, { backgroundColor: theme.colors.background }]}>
-        {/* Header */}
-        <View style={[styles.header, { backgroundColor: theme.colors.surface }]}>
-          <View style={styles.headerTop}>
-            <View style={styles.logoContainer}>
-              <Pressable onPress={handleImagePick} style={styles.avatarContainer}>
-                <View style={styles.avatarWrapper}>
-                  <ProfileImage
-                    imageId={userProfile?.profile_image_id}
-                    size={80}
-                    folder="avatars"
-                    tempImageUrl={tempImageUrl}
+          {/* Header */}
+          <View style={[styles.header, { backgroundColor: theme.colors.surface }]}>
+            <View style={styles.headerTop}>
+              <View style={styles.logoContainer}>
+                <Pressable onPress={handleImagePick} style={styles.avatarContainer}>
+                  <View style={styles.avatarWrapper}>
+                    <ProfileImage
+                      imageId={userProfile?.profile_image_id}
+                      size={80}
+                      folder="avatars"
+                      tempImageUrl={tempImageUrl}
+                    />
+                    {isUploading && (
+                      <View style={styles.uploadingOverlay}>
+                        <ActivityIndicator color={theme.colors.primary} size="small" />
+                      </View>
+                    )}
+                  </View>
+                </Pressable>
+                <Text variant="titleLarge" style={{ marginLeft: 8 }}>
+                  {userProfile?.username || 'Profile'}
+                </Text>
+              </View>
+            </View>
+          </View>
+
+          {/* Profile Info */}
+          <View style={[styles.profileInfo, { backgroundColor: theme.colors.surface }]}>
+            <Text variant="titleMedium" style={{ color: theme.colors.onSurface }}>
+              {userProfile?.email || ''}
+            </Text>
+            <Text
+              variant="bodyMedium"
+              style={{ color: theme.colors.onSurfaceVariant, marginTop: 4 }}>
+              {userProfile?.display_name || userProfile?.username || 'User'}
+            </Text>
+          </View>
+
+          {/* Navigation Options */}
+          <View style={[styles.navigationContainer, { backgroundColor: theme.colors.surface }]}>
+            <View style={styles.navigationContent}>
+              <TouchableOpacity
+                onPress={() => router.push('/profile/my-posts' as any)}
+                style={styles.navigationButton}
+                activeOpacity={0.7}>
+                <View style={styles.buttonInner}>
+                  <View style={styles.buttonLeftContent}>
+                    <MaterialCommunityIcons name="post" size={20} color={theme.colors.primary} />
+                    <Text variant="bodyMedium" style={styles.buttonText}>
+                      My Posts
+                    </Text>
+                  </View>
+                  <MaterialCommunityIcons
+                    name="chevron-right"
+                    size={20}
+                    color={theme.colors.onSurfaceVariant}
                   />
-                  {isUploading && (
-                    <View style={styles.uploadingOverlay}>
-                      <ActivityIndicator color={theme.colors.primary} size="small" />
-                    </View>
-                  )}
                 </View>
-              </Pressable>
-              <Text variant="titleLarge" style={{ marginLeft: 8 }}>
-                {userProfile?.username || 'Profile'}
-              </Text>
+              </TouchableOpacity>
+              <Divider />
+              <TouchableOpacity
+                onPress={() => router.push('/profile/saved-posts' as any)}
+                style={styles.navigationButton}
+                activeOpacity={0.7}>
+                <View style={styles.buttonInner}>
+                  <View style={styles.buttonLeftContent}>
+                    <MaterialCommunityIcons
+                      name="bookmark"
+                      size={20}
+                      color={theme.colors.primary}
+                    />
+                    <Text variant="bodyMedium" style={styles.buttonText}>
+                      Saved Posts
+                    </Text>
+                  </View>
+                  <MaterialCommunityIcons
+                    name="chevron-right"
+                    size={20}
+                    color={theme.colors.onSurfaceVariant}
+                  />
+                </View>
+              </TouchableOpacity>
+              <Divider />
+              <TouchableOpacity
+                onPress={() => router.push('/profile/BlockedUsers' as any)}
+                style={styles.navigationButton}
+                activeOpacity={0.7}>
+                <View style={styles.buttonInner}>
+                  <View style={styles.buttonLeftContent}>
+                    <MaterialCommunityIcons
+                      name="account-remove"
+                      size={20}
+                      color={theme.colors.primary}
+                    />
+                    <Text variant="bodyMedium" style={styles.buttonText}>
+                      Blocked Users
+                    </Text>
+                  </View>
+                  <MaterialCommunityIcons
+                    name="chevron-right"
+                    size={20}
+                    color={theme.colors.onSurfaceVariant}
+                  />
+                </View>
+              </TouchableOpacity>
+              <Divider />
+              <TouchableOpacity
+                onPress={() => router.push('/(tabs)/profile/contact-support' as any)}
+                style={styles.navigationButton}
+                activeOpacity={0.7}>
+                <View style={styles.buttonInner}>
+                  <View style={styles.buttonLeftContent}>
+                    <MaterialCommunityIcons name="headset" size={20} color={theme.colors.primary} />
+                    <Text variant="bodyMedium" style={styles.buttonText}>
+                      Contact Support
+                    </Text>
+                  </View>
+                  <MaterialCommunityIcons
+                    name="chevron-right"
+                    size={20}
+                    color={theme.colors.onSurfaceVariant}
+                  />
+                </View>
+              </TouchableOpacity>
+              <Divider />
+              <TouchableOpacity
+                onPress={() => router.push('/(tabs)/profile/notification-settings' as any)}
+                style={styles.navigationButton}
+                activeOpacity={0.7}>
+                <View style={styles.buttonInner}>
+                  <View style={styles.buttonLeftContent}>
+                    <MaterialCommunityIcons name="bell" size={20} color={theme.colors.primary} />
+                    <Text variant="bodyMedium" style={styles.buttonText}>
+                      Notification Settings
+                    </Text>
+                  </View>
+                  <MaterialCommunityIcons
+                    name="chevron-right"
+                    size={20}
+                    color={theme.colors.onSurfaceVariant}
+                  />
+                </View>
+              </TouchableOpacity>
+              <Divider />
+              <TouchableOpacity
+                onPress={() => setShowCountryModal(true)}
+                style={styles.navigationButton}
+                activeOpacity={0.7}>
+                <View style={styles.buttonInner}>
+                  <View style={styles.buttonLeftContent}>
+                    <MaterialCommunityIcons name="earth" size={20} color={theme.colors.primary} />
+                    <View style={styles.countryInfoContainer}>
+                      <Text variant="bodyMedium" style={styles.buttonText}>
+                        Location / Country
+                      </Text>
+                      {country && (
+                        <Text
+                          variant="bodySmall"
+                          style={[styles.countrySubtext, { color: theme.colors.onSurfaceVariant }]}>
+                          {COUNTRY_DATA[country].name}
+                        </Text>
+                      )}
+                    </View>
+                  </View>
+                  <MaterialCommunityIcons
+                    name="chevron-right"
+                    size={20}
+                    color={theme.colors.onSurfaceVariant}
+                  />
+                </View>
+              </TouchableOpacity>
+            </View>
+          </View>
+
+          {/* Bottom Actions */}
+          <View style={[styles.bottomActionsContainer, { backgroundColor: theme.colors.surface }]}>
+            <View style={styles.bottomActionsContent}>
+              <TouchableOpacity
+                onPress={toggleTheme}
+                style={styles.bottomActionButton}
+                activeOpacity={0.7}>
+                <View style={styles.buttonInner}>
+                  <View style={styles.buttonLeftContent}>
+                    <MaterialCommunityIcons
+                      name={isDarkMode ? 'weather-sunny' : 'weather-night'}
+                      size={20}
+                      color={theme.colors.primary}
+                    />
+                    <Text variant="bodyMedium" style={styles.buttonText}>
+                      {isDarkMode ? 'Light Mode' : 'Dark Mode'}
+                    </Text>
+                  </View>
+                </View>
+              </TouchableOpacity>
+              <Divider />
+              <TouchableOpacity
+                onPress={handleSignOut}
+                style={styles.bottomActionButton}
+                activeOpacity={0.7}>
+                <View style={styles.buttonInner}>
+                  <View style={styles.buttonLeftContent}>
+                    <MaterialCommunityIcons name="logout" size={20} color={theme.colors.error} />
+                    <Text
+                      variant="bodyMedium"
+                      style={[styles.buttonText, { color: theme.colors.error }]}>
+                      Sign Out
+                    </Text>
+                  </View>
+                </View>
+              </TouchableOpacity>
             </View>
           </View>
         </View>
-
-        {/* Profile Info */}
-        <View style={[styles.profileInfo, { backgroundColor: theme.colors.surface }]}>
-          <Text variant="titleMedium" style={{ color: theme.colors.onSurface }}>
-            {userProfile?.email || ''}
-          </Text>
-          <Text
-            variant="bodyMedium"
-            style={{ color: theme.colors.onSurfaceVariant, marginTop: 4 }}
-          >
-            {userProfile?.display_name || userProfile?.username || 'User'}
-          </Text>
-        </View>
-
-        {/* Navigation Options */}
-        <View style={[styles.navigationContainer, { backgroundColor: theme.colors.surface }]}>
-          <View style={styles.navigationContent}>
-            <TouchableOpacity
-              onPress={() => router.push("/profile/my-posts" as any)}
-              style={styles.navigationButton}
-              activeOpacity={0.7}
-            >
-              <View style={styles.buttonInner}>
-                <View style={styles.buttonLeftContent}>
-                  <MaterialCommunityIcons name="post" size={20} color={theme.colors.primary} />
-                  <Text variant="bodyMedium" style={styles.buttonText}>My Posts</Text>
-                </View>
-                <MaterialCommunityIcons name="chevron-right" size={20} color={theme.colors.onSurfaceVariant} />
-              </View>
-            </TouchableOpacity>
-            <Divider />
-            <TouchableOpacity
-              onPress={() => router.push("/profile/saved-posts" as any)}
-              style={styles.navigationButton}
-              activeOpacity={0.7}
-            >
-              <View style={styles.buttonInner}>
-                <View style={styles.buttonLeftContent}>
-                  <MaterialCommunityIcons name="bookmark" size={20} color={theme.colors.primary} />
-                  <Text variant="bodyMedium" style={styles.buttonText}>Saved Posts</Text>
-                </View>
-                <MaterialCommunityIcons name="chevron-right" size={20} color={theme.colors.onSurfaceVariant} />
-              </View>
-            </TouchableOpacity>
-            <Divider />
-            <TouchableOpacity
-              onPress={() => router.push("/profile/BlockedUsers" as any)}
-              style={styles.navigationButton}
-              activeOpacity={0.7}
-            >
-              <View style={styles.buttonInner}>
-                <View style={styles.buttonLeftContent}>
-                  <MaterialCommunityIcons name="account-remove" size={20} color={theme.colors.primary} />
-                  <Text variant="bodyMedium" style={styles.buttonText}>Blocked Users</Text>
-                </View>
-                <MaterialCommunityIcons name="chevron-right" size={20} color={theme.colors.onSurfaceVariant} />
-              </View>
-            </TouchableOpacity>
-            <Divider />
-            <TouchableOpacity
-              onPress={() => router.push("/(tabs)/profile/contact-support" as any)}
-              style={styles.navigationButton}
-              activeOpacity={0.7}
-            >
-              <View style={styles.buttonInner}>
-                <View style={styles.buttonLeftContent}>
-                  <MaterialCommunityIcons name="headset" size={20} color={theme.colors.primary} />
-                  <Text variant="bodyMedium" style={styles.buttonText}>Contact Support</Text>
-                </View>
-                <MaterialCommunityIcons name="chevron-right" size={20} color={theme.colors.onSurfaceVariant} />
-              </View>
-            </TouchableOpacity>
-            <Divider />
-            <TouchableOpacity
-              onPress={() => router.push("/(tabs)/profile/notification-settings" as any)}
-              style={styles.navigationButton}
-              activeOpacity={0.7}
-            >
-              <View style={styles.buttonInner}>
-                <View style={styles.buttonLeftContent}>
-                  <MaterialCommunityIcons name="bell" size={20} color={theme.colors.primary} />
-                  <Text variant="bodyMedium" style={styles.buttonText}>Notification Settings</Text>
-                </View>
-                <MaterialCommunityIcons name="chevron-right" size={20} color={theme.colors.onSurfaceVariant} />
-              </View>
-            </TouchableOpacity>
-            <Divider />
-            <TouchableOpacity
-              onPress={() => setShowCountryModal(true)}
-              style={styles.navigationButton}
-              activeOpacity={0.7}
-            >
-              <View style={styles.buttonInner}>
-                <View style={styles.buttonLeftContent}>
-                  <MaterialCommunityIcons name="earth" size={20} color={theme.colors.primary} />
-                  <View style={styles.countryInfoContainer}>
-                    <Text variant="bodyMedium" style={styles.buttonText}>Location / Country</Text>
-                    {country && (
-                      <Text variant="bodySmall" style={[styles.countrySubtext, { color: theme.colors.onSurfaceVariant }]}>
-                        {COUNTRY_DATA[country].name}
-                      </Text>
-                    )}
-                  </View>
-                </View>
-                <MaterialCommunityIcons name="chevron-right" size={20} color={theme.colors.onSurfaceVariant} />
-              </View>
-            </TouchableOpacity>
-          </View>
-        </View>
-
-        {/* Bottom Actions */}
-        <View style={[styles.bottomActionsContainer, { backgroundColor: theme.colors.surface }]}>
-          <View style={styles.bottomActionsContent}>
-            <TouchableOpacity
-              onPress={toggleTheme}
-              style={styles.bottomActionButton}
-              activeOpacity={0.7}
-            >
-              <View style={styles.buttonInner}>
-                <View style={styles.buttonLeftContent}>
-                  <MaterialCommunityIcons 
-                    name={isDarkMode ? "weather-sunny" : "weather-night"} 
-                    size={20} 
-                    color={theme.colors.primary} 
-                  />
-                  <Text variant="bodyMedium" style={styles.buttonText}>
-                    {isDarkMode ? 'Light Mode' : 'Dark Mode'}
-                  </Text>
-                </View>
-              </View>
-            </TouchableOpacity>
-            <Divider />
-            <TouchableOpacity
-              onPress={handleSignOut}
-              style={styles.bottomActionButton}
-              activeOpacity={0.7}
-            >
-              <View style={styles.buttonInner}>
-                <View style={styles.buttonLeftContent}>
-                  <MaterialCommunityIcons name="logout" size={20} color={theme.colors.error} />
-                  <Text variant="bodyMedium" style={[styles.buttonText, { color: theme.colors.error }]}>
-                    Sign Out
-                  </Text>
-                </View>
-              </View>
-            </TouchableOpacity>
-          </View>
-        </View>
-      </View>
       )}
-      
+
       <Portal>
         <LoginRequiredModal
           visible={showLoginModal}
@@ -369,164 +415,162 @@ export default function ProfileScreen() {
           customTitle="Login Required"
           customMessage="You need to be logged in to view profile"
         />
-        
+
         {/* Country Selection Modal */}
         <Modal
           visible={showCountryModal}
           onDismiss={() => setShowCountryModal(false)}
-          contentContainerStyle={[styles.modalContent, { backgroundColor: theme.colors.surface }]}
-        >
+          contentContainerStyle={[styles.modalContent, { backgroundColor: theme.colors.surface }]}>
           <View style={styles.modalHeader}>
-            <Text variant="headlineSmall" style={[styles.modalTitle, { color: theme.colors.onSurface }]}>
+            <Text
+              variant="headlineSmall"
+              style={[styles.modalTitle, { color: theme.colors.onSurface }]}>
               Select Your Country
             </Text>
-            <IconButton
-              icon="close"
-              size={24}
-              onPress={() => setShowCountryModal(false)}
-            />
+            <IconButton icon="close" size={24} onPress={() => setShowCountryModal(false)} />
           </View>
-              
-              <Text variant="bodyMedium" style={[styles.modalDescription, { color: theme.colors.onSurfaceVariant }]}>
-                Changing your country will update the listings you see and the available cities.
-              </Text>
 
-              <View style={styles.countryOptionsContainer}>
-                <TouchableOpacity
-                  onPress={async () => {
-                    await setCountry('afghanistan');
-                    setShowCountryModal(false);
-                    // Optionally refresh posts or show a success message
-                  }}
-                  activeOpacity={0.7}
-                >
-                  <View
-                    style={[
-                      styles.countryOption,
-                      {
-                        backgroundColor: country === 'afghanistan'
-                          ? theme.colors.primaryContainer
-                          : theme.colors.surfaceVariant,
-                        borderColor: country === 'afghanistan'
-                          ? theme.colors.primary
-                          : theme.colors.outline,
-                        borderWidth: country === 'afghanistan' ? 2 : 1,
-                      },
-                    ]}
-                  >
-                    <MaterialCommunityIcons
-                      name="flag"
-                      size={32}
-                      color={country === 'afghanistan' ? theme.colors.primary : theme.colors.onSurfaceVariant}
-                    />
-                    <View style={styles.countryOptionText}>
-                      <Text
-                        variant="titleMedium"
-                        style={[
-                          styles.countryOptionName,
-                          {
-                            color: country === 'afghanistan'
-                              ? theme.colors.onPrimaryContainer
-                              : theme.colors.onSurfaceVariant,
-                          },
-                        ]}
-                      >
-                        Afghanistan
-                      </Text>
-                      <Text
-                        variant="bodySmall"
-                        style={[
-                          styles.countryOptionCurrency,
-                          {
-                            color: country === 'afghanistan'
-                              ? theme.colors.onPrimaryContainer
-                              : theme.colors.onSurfaceVariant,
-                          },
-                        ]}
-                      >
-                        Currency: {COUNTRY_DATA.afghanistan.currency}
-                      </Text>
-                    </View>
-                    {country === 'afghanistan' && (
-                      <MaterialCommunityIcons
-                        name="check-circle"
-                        size={24}
-                        color={theme.colors.primary}
-                      />
-                    )}
-                  </View>
-                </TouchableOpacity>
+          <Text
+            variant="bodyMedium"
+            style={[styles.modalDescription, { color: theme.colors.onSurfaceVariant }]}>
+            Changing your country will update the listings you see and the available cities.
+          </Text>
 
-                <TouchableOpacity
-                  onPress={async () => {
-                    await setCountry('pakistan');
-                    setShowCountryModal(false);
-                  }}
-                  activeOpacity={0.7}
-                >
-                  <View
+          <View style={styles.countryOptionsContainer}>
+            <TouchableOpacity
+              onPress={async () => {
+                await setCountry('afghanistan');
+                setShowCountryModal(false);
+                // Optionally refresh posts or show a success message
+              }}
+              activeOpacity={0.7}>
+              <View
+                style={[
+                  styles.countryOption,
+                  {
+                    backgroundColor:
+                      country === 'afghanistan'
+                        ? theme.colors.primaryContainer
+                        : theme.colors.surfaceVariant,
+                    borderColor:
+                      country === 'afghanistan' ? theme.colors.primary : theme.colors.outline,
+                    borderWidth: country === 'afghanistan' ? 2 : 1,
+                  },
+                ]}>
+                <MaterialCommunityIcons
+                  name="flag"
+                  size={32}
+                  color={
+                    country === 'afghanistan' ? theme.colors.primary : theme.colors.onSurfaceVariant
+                  }
+                />
+                <View style={styles.countryOptionText}>
+                  <Text
+                    variant="titleMedium"
                     style={[
-                      styles.countryOption,
+                      styles.countryOptionName,
                       {
-                        backgroundColor: country === 'pakistan'
-                          ? theme.colors.primaryContainer
-                          : theme.colors.surfaceVariant,
-                        borderColor: country === 'pakistan'
-                          ? theme.colors.primary
-                          : theme.colors.outline,
-                        borderWidth: country === 'pakistan' ? 2 : 1,
+                        color:
+                          country === 'afghanistan'
+                            ? theme.colors.onPrimaryContainer
+                            : theme.colors.onSurfaceVariant,
                       },
-                    ]}
-                  >
-                    <MaterialCommunityIcons
-                      name="flag"
-                      size={32}
-                      color={country === 'pakistan' ? theme.colors.primary : theme.colors.onSurfaceVariant}
-                    />
-                    <View style={styles.countryOptionText}>
-                      <Text
-                        variant="titleMedium"
-                        style={[
-                          styles.countryOptionName,
-                          {
-                            color: country === 'pakistan'
-                              ? theme.colors.onPrimaryContainer
-                              : theme.colors.onSurfaceVariant,
-                          },
-                        ]}
-                      >
-                        Pakistan
-                      </Text>
-                      <Text
-                        variant="bodySmall"
-                        style={[
-                          styles.countryOptionCurrency,
-                          {
-                            color: country === 'pakistan'
-                              ? theme.colors.onPrimaryContainer
-                              : theme.colors.onSurfaceVariant,
-                          },
-                        ]}
-                      >
-                        Currency: {COUNTRY_DATA.pakistan.currency}
-                      </Text>
-                    </View>
-                    {country === 'pakistan' && (
-                      <MaterialCommunityIcons
-                        name="check-circle"
-                        size={24}
-                        color={theme.colors.primary}
-                      />
-                    )}
-                  </View>
-                </TouchableOpacity>
+                    ]}>
+                    Afghanistan
+                  </Text>
+                  <Text
+                    variant="bodySmall"
+                    style={[
+                      styles.countryOptionCurrency,
+                      {
+                        color:
+                          country === 'afghanistan'
+                            ? theme.colors.onPrimaryContainer
+                            : theme.colors.onSurfaceVariant,
+                      },
+                    ]}>
+                    Currency: {COUNTRY_DATA.afghanistan.currency}
+                  </Text>
+                </View>
+                {country === 'afghanistan' && (
+                  <MaterialCommunityIcons
+                    name="check-circle"
+                    size={24}
+                    color={theme.colors.primary}
+                  />
+                )}
               </View>
+            </TouchableOpacity>
+
+            <TouchableOpacity
+              onPress={async () => {
+                await setCountry('pakistan');
+                setShowCountryModal(false);
+              }}
+              activeOpacity={0.7}>
+              <View
+                style={[
+                  styles.countryOption,
+                  {
+                    backgroundColor:
+                      country === 'pakistan'
+                        ? theme.colors.primaryContainer
+                        : theme.colors.surfaceVariant,
+                    borderColor:
+                      country === 'pakistan' ? theme.colors.primary : theme.colors.outline,
+                    borderWidth: country === 'pakistan' ? 2 : 1,
+                  },
+                ]}>
+                <MaterialCommunityIcons
+                  name="flag"
+                  size={32}
+                  color={
+                    country === 'pakistan' ? theme.colors.primary : theme.colors.onSurfaceVariant
+                  }
+                />
+                <View style={styles.countryOptionText}>
+                  <Text
+                    variant="titleMedium"
+                    style={[
+                      styles.countryOptionName,
+                      {
+                        color:
+                          country === 'pakistan'
+                            ? theme.colors.onPrimaryContainer
+                            : theme.colors.onSurfaceVariant,
+                      },
+                    ]}>
+                    Pakistan
+                  </Text>
+                  <Text
+                    variant="bodySmall"
+                    style={[
+                      styles.countryOptionCurrency,
+                      {
+                        color:
+                          country === 'pakistan'
+                            ? theme.colors.onPrimaryContainer
+                            : theme.colors.onSurfaceVariant,
+                      },
+                    ]}>
+                    Currency: {COUNTRY_DATA.pakistan.currency}
+                  </Text>
+                </View>
+                {country === 'pakistan' && (
+                  <MaterialCommunityIcons
+                    name="check-circle"
+                    size={24}
+                    color={theme.colors.primary}
+                  />
+                )}
+              </View>
+            </TouchableOpacity>
+          </View>
 
           <Button
             mode="contained"
             onPress={() => setShowCountryModal(false)}
-            style={styles.modalCloseButton}
-          >
+            style={styles.modalCloseButton}>
             Done
           </Button>
         </Modal>
@@ -544,33 +588,33 @@ const styles = StyleSheet.create({
     elevation: 2,
   },
   headerTop: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
     paddingVertical: 8,
   },
-     logoContainer: {
-     flexDirection: "row",
-     alignItems: "center",
-     gap: 16,
-   },
-   avatarContainer: {
-     position: 'relative',
-   },
-   avatarWrapper: {
-     position: 'relative',
-   },
-   uploadingOverlay: {
-     position: 'absolute',
-     top: 0,
-     left: 0,
-     width: 80,
-     height: 80,
-     borderRadius: 40,
-     justifyContent: 'center',
-     alignItems: 'center',
-     backgroundColor: 'rgba(0, 0, 0, 0.3)',
-   },
+  logoContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 16,
+  },
+  avatarContainer: {
+    position: 'relative',
+  },
+  avatarWrapper: {
+    position: 'relative',
+  },
+  uploadingOverlay: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    width: 80,
+    height: 80,
+    borderRadius: 40,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: 'rgba(0, 0, 0, 0.3)',
+  },
   profileInfo: {
     padding: 16,
     marginTop: 10,

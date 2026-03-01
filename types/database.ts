@@ -51,12 +51,12 @@ export interface Post extends BasePost {
   user: User;
 }
 
-export type IconName = 
-  | 'car' 
-  | 'calendar' 
-  | 'speedometer' 
-  | 'car-cog' 
-  | 'gas-station' 
+export type IconName =
+  | 'car'
+  | 'calendar'
+  | 'speedometer'
+  | 'car-cog'
+  | 'gas-station'
   | 'car-shift-pattern'
   | 'map-marker'
   | 'phone'
@@ -81,4 +81,4 @@ export type IconName =
 export interface CarouselRenderItemInfo {
   item: string;
   index: number;
-} 
+}

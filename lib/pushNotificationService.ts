@@ -44,7 +44,7 @@ export class PushNotificationService {
     try {
       // Set up notification listeners
       this.setupNotificationListeners();
-      
+
       // Load existing token from storage
       const storedToken = await this.getStoredToken();
       if (storedToken) {
@@ -85,8 +85,9 @@ export class PushNotificationService {
    */
   private async saveTokenToDatabase(token: string): Promise<boolean> {
     try {
-      const deviceId = Device.osInternalBuildId || Device.deviceName || Device.modelName || 'unknown';
-      
+      const deviceId =
+        Device.osInternalBuildId || Device.deviceName || Device.modelName || 'unknown';
+
       const { error } = await supabase.rpc('register_expo_push_token', {
         p_expo_push_token: token,
         p_device_id: deviceId,
@@ -96,7 +97,7 @@ export class PushNotificationService {
         console.error('Error saving token to database:', error);
         return false;
       }
-      
+
       return true;
     } catch (error) {
       console.error('Error saving token:', error);
@@ -136,18 +137,19 @@ export class PushNotificationService {
       // Check and request permissions
       const { status: existingStatus } = await Notifications.getPermissionsAsync();
       let finalStatus = existingStatus;
-      
+
       if (existingStatus !== 'granted') {
         const { status } = await Notifications.requestPermissionsAsync();
         finalStatus = status;
       }
-      
+
       if (finalStatus !== 'granted') {
         return null;
       }
 
       // Get project ID
-      const projectId = Constants?.expoConfig?.extra?.eas?.projectId ?? Constants?.easConfig?.projectId;
+      const projectId =
+        Constants?.expoConfig?.extra?.eas?.projectId ?? Constants?.easConfig?.projectId;
       if (!projectId) {
         console.error('Project ID not found');
         return null;
@@ -178,10 +180,10 @@ export class PushNotificationService {
    */
   setupNotificationListeners(): void {
     // Handle notifications received while app is in foreground
-    Notifications.addNotificationReceivedListener(_notification => {});
+    Notifications.addNotificationReceivedListener((_notification) => {});
 
     // Handle notification responses (when user taps on notification)
-    Notifications.addNotificationResponseReceivedListener(response => {
+    Notifications.addNotificationResponseReceivedListener((response) => {
       this.handleNotificationResponse(response);
     });
   }
@@ -191,7 +193,7 @@ export class PushNotificationService {
    */
   private handleNotificationResponse(response: Notifications.NotificationResponse): void {
     const data = response.notification.request.content.data;
-    
+
     switch (data.type) {
       case 'message':
         // TODO (C-5): navigate to ChatRoom with data.conversationId
@@ -213,12 +215,15 @@ export class PushNotificationService {
   ): Promise<boolean> {
     try {
       // Check if we should send notification
-      const { data: shouldSend, error: checkError } = await supabase.rpc('should_send_notification', {
-        p_recipient_id: recipientUserId,
-        p_sender_id: data.senderId || 'system',
-        p_notification_type: data.type || 'message',
-        p_conversation_id: data.conversationId || null
-      });
+      const { data: shouldSend, error: checkError } = await supabase.rpc(
+        'should_send_notification',
+        {
+          p_recipient_id: recipientUserId,
+          p_sender_id: data.senderId || 'system',
+          p_notification_type: data.type || 'message',
+          p_conversation_id: data.conversationId || null,
+        }
+      );
 
       if (checkError || !shouldSend) {
         return false;
@@ -226,7 +231,7 @@ export class PushNotificationService {
 
       // Get recipient's push tokens
       const { data: tokens, error: tokensError } = await supabase.rpc('get_user_expo_push_tokens', {
-        p_user_id: recipientUserId
+        p_user_id: recipientUserId,
       });
 
       if (tokensError || !tokens || tokens.length === 0) {
@@ -249,7 +254,7 @@ export class PushNotificationService {
       const response = await fetch('https://exp.host/--/api/v2/push/send', {
         method: 'POST',
         headers: {
-          'Accept': 'application/json',
+          Accept: 'application/json',
           'Accept-encoding': 'gzip, deflate',
           'Content-Type': 'application/json',
         },
@@ -257,7 +262,7 @@ export class PushNotificationService {
       });
 
       const result = await response.json();
-      
+
       if (response.ok) {
         return true;
       } else {
@@ -307,7 +312,7 @@ export class PushNotificationService {
     if (this.expoPushToken) {
       return true;
     }
-    
+
     const storedToken = await this.getStoredToken();
     return storedToken !== null;
   }

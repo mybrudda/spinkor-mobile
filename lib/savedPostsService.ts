@@ -7,7 +7,8 @@ export const savedPostsService = {
     // First check if the user is the creator of the post
     const { data, error } = await supabase
       .from('posts')
-      .select(`
+      .select(
+        `
         id,
         title,
         description,
@@ -32,7 +33,8 @@ export const savedPostsService = {
           user_type,
           is_verified
         )
-      `)
+      `
+      )
       .eq('id', postId)
       .single();
 
@@ -45,14 +47,12 @@ export const savedPostsService = {
       throw new Error('Cannot save your own post');
     }
 
-    const { error: savedPostError } = await supabase
-      .from('saved_posts')
-      .insert([
-        {
-          user_id: userId,
-          post_id: postId,
-        }
-      ]);
+    const { error: savedPostError } = await supabase.from('saved_posts').insert([
+      {
+        user_id: userId,
+        post_id: postId,
+      },
+    ]);
 
     if (savedPostError) {
       console.error('Error saving post:', savedPostError);
@@ -83,7 +83,7 @@ export const savedPostsService = {
       .eq('post_id', postId)
       .single();
 
-    if (error && error.code !== 'PGRST116') { 
+    if (error && error.code !== 'PGRST116') {
       console.error('Error checking if post is saved:', error);
       throw error;
     }
@@ -95,7 +95,8 @@ export const savedPostsService = {
   async getSavedPosts(userId: string): Promise<Post[]> {
     const { data, error } = await supabase
       .from('saved_posts')
-      .select(`
+      .select(
+        `
         post_id,
         posts (
           id,
@@ -124,7 +125,8 @@ export const savedPostsService = {
             is_verified
           )
         )
-      `)
+      `
+      )
       .eq('user_id', userId)
       .eq('posts.status', 'active');
 
@@ -134,10 +136,15 @@ export const savedPostsService = {
     }
 
     // Transform the data to match the Post interface
-    return data?.map(item => ({
-      ...item.posts,
-      user: item.posts.user,
-    } as any)) || [];
+    return (
+      data?.map(
+        (item) =>
+          ({
+            ...item.posts,
+            user: item.posts.user,
+          }) as any
+      ) || []
+    );
   },
 
   // Get saved post IDs for the current user (for checking saved status)
@@ -152,6 +159,6 @@ export const savedPostsService = {
       throw error;
     }
 
-    return data?.map(item => item.post_id) || [];
-  }
-}; 
+    return data?.map((item) => item.post_id) || [];
+  },
+};

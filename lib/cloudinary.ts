@@ -1,8 +1,6 @@
-
-
 const CLOUDINARY_CONFIG = {
-  cloud_name: "dtac4dhtj",
-  upload_preset: "Default",
+  cloud_name: 'dtac4dhtj',
+  upload_preset: 'Default',
 };
 
 interface CloudinaryResponse {
@@ -16,9 +14,12 @@ interface CloudinaryResponse {
  * @param folder - Optional folder name (defaults to 'avatars')
  * @returns The complete Cloudinary URL
  */
-export const getCloudinaryUrl = (imageId: string | null, folder: string = 'avatars'): string | null => {
+export const getCloudinaryUrl = (
+  imageId: string | null,
+  folder: string = 'avatars'
+): string | null => {
   if (!imageId) return null;
-  
+
   // If the imageId already includes the folder, use it as is
   const publicId = imageId.includes('/') ? imageId : `${folder}/${imageId}`;
   return `https://res.cloudinary.com/${CLOUDINARY_CONFIG.cloud_name}/image/upload/${publicId}`;
@@ -30,7 +31,10 @@ export const getCloudinaryUrl = (imageId: string | null, folder: string = 'avata
  * @param folder - Optional folder name (defaults to 'posts')
  * @returns The image ID (without folder prefix)
  */
-export const uploadToCloudinary = async (base64Image: string, folder: string = 'posts'): Promise<string> => {
+export const uploadToCloudinary = async (
+  base64Image: string,
+  folder: string = 'posts'
+): Promise<string> => {
   try {
     const formData = new FormData();
     formData.append('file', base64Image);
@@ -52,16 +56,16 @@ export const uploadToCloudinary = async (base64Image: string, folder: string = '
     }
 
     const data: CloudinaryResponse = await response.json();
-    
+
     // Return only the image ID, not the full URL
     const imageId = data.public_id.split('/').pop();
     if (!imageId) {
       throw new Error('Failed to extract image ID from Cloudinary response');
     }
-    
+
     return imageId;
   } catch (error) {
     console.error('Error uploading to Cloudinary:', error);
     throw new Error('Failed to upload image');
   }
-}; 
+};

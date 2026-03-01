@@ -12,13 +12,11 @@ export default function NotificationOptionsScreen() {
     <RequireAuth message="You need to be logged in to view notification options.">
       <View style={[styles.container, { backgroundColor: theme.colors.background }]}>
         <Header title="Notification Options" />
-        <ScrollView 
+        <ScrollView
           style={styles.scrollView}
           contentContainerStyle={styles.scrollContent}
-          showsVerticalScrollIndicator={false}
-        >
+          showsVerticalScrollIndicator={false}>
           <NotificationOptions />
-          
         </ScrollView>
       </View>
     </RequireAuth>
@@ -35,4 +33,4 @@ const styles = StyleSheet.create({
   scrollContent: {
     paddingBottom: 20,
   },
-}); 
+});

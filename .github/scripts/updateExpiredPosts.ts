@@ -1,8 +1,8 @@
 import { supabaseAdmin } from './supabaseAdmin';
 
 const CONFIG = {
-  BATCH_SIZE: 100,  // Number of posts to process per batch
-  MAX_RETRIES: 3   // Maximum number of retries for failed updates
+  BATCH_SIZE: 100, // Number of posts to process per batch
+  MAX_RETRIES: 3, // Maximum number of retries for failed updates
 };
 
 interface UpdateResult {
@@ -23,7 +23,7 @@ interface Post {
 async function getExpiredActivePosts(offset: number, limit: number): Promise<Post[]> {
   try {
     const now = new Date().toISOString();
-    
+
     const { data, error } = await supabaseAdmin
       .from('posts')
       .select('id, status, expires_at')
@@ -44,13 +44,15 @@ async function getExpiredActivePosts(offset: number, limit: number): Promise<Pos
 }
 
 // Update a batch of posts to expired status
-async function updatePostsToExpired(postIds: string[]): Promise<{ success: boolean; error?: string }> {
+async function updatePostsToExpired(
+  postIds: string[]
+): Promise<{ success: boolean; error?: string }> {
   try {
     const { error } = await supabaseAdmin
       .from('posts')
-      .update({ 
+      .update({
         status: 'expired',
-        updated_at: new Date().toISOString()
+        updated_at: new Date().toISOString(),
       })
       .in('id', postIds);
 
@@ -61,9 +63,9 @@ async function updatePostsToExpired(postIds: string[]): Promise<{ success: boole
     return { success: true };
   } catch (error) {
     console.error('Error updating posts to expired:', error);
-    return { 
-      success: false, 
-      error: error instanceof Error ? error.message : 'Unknown error' 
+    return {
+      success: false,
+      error: error instanceof Error ? error.message : 'Unknown error',
     };
   }
 }
@@ -71,14 +73,12 @@ async function updatePostsToExpired(postIds: string[]): Promise<{ success: boole
 // Log the update operation results
 async function logUpdateOperation(result: UpdateResult): Promise<void> {
   try {
-    const { error } = await supabaseAdmin
-      .from('cleanup_logs')
-      .insert({
-        operation: 'Update Expired Posts Status',
-        rows_affected: result.postsUpdated,
-        details: result,
-        executed_at: new Date().toISOString()
-      });
+    const { error } = await supabaseAdmin.from('cleanup_logs').insert({
+      operation: 'Update Expired Posts Status',
+      rows_affected: result.postsUpdated,
+      details: result,
+      executed_at: new Date().toISOString(),
+    });
 
     if (error) {
       console.error('Failed to log operation:', error);
@@ -91,13 +91,13 @@ async function logUpdateOperation(result: UpdateResult): Promise<void> {
 // Main function to update expired posts
 async function updateExpiredPosts(): Promise<UpdateResult> {
   console.log('Starting expired posts update process...');
-  
+
   const result: UpdateResult = {
     success: true,
     postsUpdated: 0,
     postsFailed: 0,
     totalPostsProcessed: 0,
-    timestamp: new Date().toISOString()
+    timestamp: new Date().toISOString(),
   };
 
   let offset = 0;
@@ -106,10 +106,10 @@ async function updateExpiredPosts(): Promise<UpdateResult> {
   try {
     while (hasMorePosts) {
       console.log(`Processing batch starting at offset ${offset}...`);
-      
+
       // Fetch a batch of expired posts
       const posts = await getExpiredActivePosts(offset, CONFIG.BATCH_SIZE);
-      
+
       if (posts.length === 0) {
         hasMorePosts = false;
         break;
@@ -118,15 +118,15 @@ async function updateExpiredPosts(): Promise<UpdateResult> {
       console.log(`Found ${posts.length} expired posts to update`);
 
       // Update posts to expired status
-      const postIds = posts.map(post => post.id);
+      const postIds = posts.map((post) => post.id);
       const updateResult = await updatePostsToExpired(postIds);
 
       if (updateResult.success) {
         result.postsUpdated += posts.length;
         console.log(`Successfully updated ${posts.length} posts to expired status`);
       } else {
-                     result.postsFailed += posts.length;
-             console.error(`Failed to update batch of ${posts.length} posts:`, updateResult.error);
+        result.postsFailed += posts.length;
+        console.error(`Failed to update batch of ${posts.length} posts:`, updateResult.error);
       }
 
       result.totalPostsProcessed += posts.length;
@@ -134,7 +134,7 @@ async function updateExpiredPosts(): Promise<UpdateResult> {
 
       // Add a small delay between batches to avoid overwhelming the database
       if (hasMorePosts) {
-        await new Promise(resolve => setTimeout(resolve, 1000));
+        await new Promise((resolve) => setTimeout(resolve, 1000));
       }
     }
 
@@ -142,23 +142,20 @@ async function updateExpiredPosts(): Promise<UpdateResult> {
     console.log(`Total posts processed: ${result.totalPostsProcessed}`);
     console.log(`Successfully updated: ${result.postsUpdated}`);
     console.log(`Failed updates: ${result.postsFailed}`);
-    
-    
 
     // Log the operation results
     await logUpdateOperation(result);
 
     return result;
-
   } catch (error) {
     const errorMessage = error instanceof Error ? error.message : 'Unknown error';
     console.error('Fatal error during update process:', errorMessage);
-    
-               result.success = false;
-           
-           // Log the failed operation
+
+    result.success = false;
+
+    // Log the failed operation
     await logUpdateOperation(result);
-    
+
     throw error;
   }
 }

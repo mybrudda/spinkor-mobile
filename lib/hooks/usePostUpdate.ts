@@ -7,7 +7,12 @@ import { supabase } from '../../supabaseClient';
 import { useAuthStore } from '../../store/useAuthStore';
 import { uploadToCloudinary, getCloudinaryUrl } from '../cloudinary';
 import { Post, PostDetails } from '../../types/database';
-import { BaseFormData, VALIDATION_LIMITS, DEFAULT_FORM_VALUES, ERROR_MESSAGES } from '../../types/forms';
+import {
+  BaseFormData,
+  VALIDATION_LIMITS,
+  DEFAULT_FORM_VALUES,
+  ERROR_MESSAGES,
+} from '../../types/forms';
 import { normalizeCategoryValue } from '../../constants/FormOptions';
 
 interface UsePostUpdateProps<T extends BaseFormData> {
@@ -29,9 +34,12 @@ interface ImageChange {
 const extractCloudinaryPublicId = (url: string): string | null => {
   try {
     const urlParts = url.split('/');
-    const uploadIndex = urlParts.findIndex(part => part === 'upload');
+    const uploadIndex = urlParts.findIndex((part) => part === 'upload');
     if (uploadIndex !== -1 && uploadIndex + 1 < urlParts.length) {
-      const publicId = urlParts.slice(uploadIndex + 1).join('/').split('.')[0];
+      const publicId = urlParts
+        .slice(uploadIndex + 1)
+        .join('/')
+        .split('.')[0];
       return publicId;
     }
     return null;
@@ -69,7 +77,7 @@ export function usePostUpdate<T extends BaseFormData>({
   postType,
   transformForm,
   validateForm,
-  successMessage
+  successMessage,
 }: UsePostUpdateProps<T>) {
   const { user } = useAuthStore();
   const [loading, setLoading] = useState(false);
@@ -78,8 +86,10 @@ export function usePostUpdate<T extends BaseFormData>({
 
   const initializeFormFromPost = useCallback((post: Post): T => {
     // Convert image IDs to URLs for display
-    const imageUrls = post.image_ids.map((imageId: string) => getCloudinaryUrl(imageId, 'posts') || imageId);
-    
+    const imageUrls = post.image_ids.map(
+      (imageId: string) => getCloudinaryUrl(imageId, 'posts') || imageId
+    );
+
     const postLocation = post.location || {};
     const formData: any = {
       title: post.title,
@@ -107,12 +117,14 @@ export function usePostUpdate<T extends BaseFormData>({
     }
 
     // Reset image changes tracking and initialize with current images
-    const initialImageChanges: ImageChange[] = post.image_ids.map((imageId: string, index: number) => ({
-      type: 'unchanged',
-      url: getCloudinaryUrl(imageId, 'posts') || undefined,
-      imageId,
-      index,
-    }));
+    const initialImageChanges: ImageChange[] = post.image_ids.map(
+      (imageId: string, index: number) => ({
+        type: 'unchanged',
+        url: getCloudinaryUrl(imageId, 'posts') || undefined,
+        imageId,
+        index,
+      })
+    );
     setImageChanges(initialImageChanges);
 
     return formData;
@@ -124,7 +136,10 @@ export function usePostUpdate<T extends BaseFormData>({
     source: 'gallery' | 'camera' = 'gallery'
   ) => {
     if (images.length >= VALIDATION_LIMITS.IMAGES_PER_POST) {
-      Alert.alert('Limit Reached', ERROR_MESSAGES.IMAGE_LIMIT_REACHED(VALIDATION_LIMITS.IMAGES_PER_POST));
+      Alert.alert(
+        'Limit Reached',
+        ERROR_MESSAGES.IMAGE_LIMIT_REACHED(VALIDATION_LIMITS.IMAGES_PER_POST)
+      );
       return;
     }
 
@@ -140,43 +155,47 @@ export function usePostUpdate<T extends BaseFormData>({
         // Request permissions for media library if needed
         const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
         if (status !== 'granted') {
-          Alert.alert('Permission Required', 'Media library permission is required to select images.');
+          Alert.alert(
+            'Permission Required',
+            'Media library permission is required to select images.'
+          );
           return;
         }
       }
 
-      const result = source === 'camera'
-        ? await ImagePicker.launchCameraAsync({
-            mediaTypes: "images",
-            allowsEditing: true,
-            aspect: [...DEFAULT_FORM_VALUES.IMAGE_ASPECT],
-            quality: DEFAULT_FORM_VALUES.IMAGE_QUALITY,
-            base64: true,
-          })
-        : await ImagePicker.launchImageLibraryAsync({
-            mediaTypes: "images",
-            allowsEditing: true,
-            aspect: [...DEFAULT_FORM_VALUES.IMAGE_ASPECT],
-            quality: DEFAULT_FORM_VALUES.IMAGE_QUALITY,
-            base64: true,
-          });
+      const result =
+        source === 'camera'
+          ? await ImagePicker.launchCameraAsync({
+              mediaTypes: 'images',
+              allowsEditing: true,
+              aspect: [...DEFAULT_FORM_VALUES.IMAGE_ASPECT],
+              quality: DEFAULT_FORM_VALUES.IMAGE_QUALITY,
+              base64: true,
+            })
+          : await ImagePicker.launchImageLibraryAsync({
+              mediaTypes: 'images',
+              allowsEditing: true,
+              aspect: [...DEFAULT_FORM_VALUES.IMAGE_ASPECT],
+              quality: DEFAULT_FORM_VALUES.IMAGE_QUALITY,
+              base64: true,
+            });
 
       if (!result.canceled && result.assets?.[0] && result.assets[0].base64) {
         const resizedBase64 = await resizeImage(result.assets[0].base64 as string);
         const newImages = [...images, resizedBase64];
         setImages(newImages);
-        
+
         // Track the new image as added
         const newImageChange: ImageChange = {
           type: 'added',
           base64: resizedBase64,
           index: images.length,
         };
-        setImageChanges(prev => [...prev, newImageChange]);
-        
+        setImageChanges((prev) => [...prev, newImageChange]);
+
         // Clear image error if images are now valid
         if (newImages.length >= VALIDATION_LIMITS.MIN_IMAGES && errors.images) {
-          setErrors(prev => {
+          setErrors((prev) => {
             const newErrors = { ...prev };
             delete newErrors.images;
             return newErrors;
@@ -196,16 +215,16 @@ export function usePostUpdate<T extends BaseFormData>({
   ) => {
     const newImages = images.filter((_, i) => i !== index);
     setImages(newImages);
-    
+
     // Track the removed image
     const removedImage = images[index];
     const isUrl = removedImage.startsWith('http');
-    
+
     // Find the original image ID for this URL
-    const originalImageChange = imageChanges.find(change => 
-      change.url === removedImage && change.type === 'unchanged'
+    const originalImageChange = imageChanges.find(
+      (change) => change.url === removedImage && change.type === 'unchanged'
     );
-    
+
     const newImageChange: ImageChange = {
       type: 'removed',
       url: isUrl ? removedImage : undefined,
@@ -213,19 +232,19 @@ export function usePostUpdate<T extends BaseFormData>({
       imageId: originalImageChange?.imageId,
       index,
     };
-    setImageChanges(prev => [...prev, newImageChange]);
-    
+    setImageChanges((prev) => [...prev, newImageChange]);
+
     // Clear image error if images are still valid, or add error if now invalid
     if (newImages.length >= VALIDATION_LIMITS.MIN_IMAGES && errors.images) {
-      setErrors(prev => {
+      setErrors((prev) => {
         const newErrors = { ...prev };
         delete newErrors.images;
         return newErrors;
       });
     } else if (newImages.length < VALIDATION_LIMITS.MIN_IMAGES && !errors.images) {
-      setErrors(prev => ({
+      setErrors((prev) => ({
         ...prev,
-        images: 'At least one image is required'
+        images: 'At least one image is required',
       }));
     }
   };
@@ -239,7 +258,7 @@ export function usePostUpdate<T extends BaseFormData>({
     setFormState({ ...formState, [field]: value });
     const fieldKey = String(field);
     if (errors[fieldKey]) {
-      setErrors(prev => {
+      setErrors((prev) => {
         const newErrors = { ...prev };
         delete newErrors[fieldKey];
         return newErrors;
@@ -255,11 +274,11 @@ export function usePostUpdate<T extends BaseFormData>({
   ) => {
     setFormState({
       ...formState,
-      location: { ...formState.location, [field]: value }
+      location: { ...formState.location, [field]: value },
     });
     const locationFieldKey = `location.${String(field)}`;
     if (errors[locationFieldKey]) {
-      setErrors(prev => {
+      setErrors((prev) => {
         const newErrors = { ...prev };
         delete newErrors[locationFieldKey];
         return newErrors;
@@ -287,12 +306,13 @@ export function usePostUpdate<T extends BaseFormData>({
 
     setLoading(true);
     let uploadedImageIds: string[] = [];
-    
+
     try {
       // Load existing post data
       const { data: post, error: fetchError } = await supabase
         .from('posts')
-        .select(`
+        .select(
+          `
           *,
           user:user_id (
             id,
@@ -303,7 +323,8 @@ export function usePostUpdate<T extends BaseFormData>({
             user_type,
             is_verified
           )
-        `)
+        `
+        )
         .eq('id', postId)
         .single();
 
@@ -317,7 +338,9 @@ export function usePostUpdate<T extends BaseFormData>({
 
       // Transform existing data to form state
       const existingImages = post.image_ids || [];
-      const imageUrls = existingImages.map((imageId: string) => getCloudinaryUrl(imageId, 'posts') || imageId);
+      const imageUrls = existingImages.map(
+        (imageId: string) => getCloudinaryUrl(imageId, 'posts') || imageId
+      );
 
       // First test if we can connect to Supabase
       const testQuery = await supabase.from('posts').select('id').limit(1);
@@ -347,16 +370,18 @@ export function usePostUpdate<T extends BaseFormData>({
       // Upload new base64 images
       if (newImages.length > 0) {
         uploadedImageIds = await Promise.all(
-          newImages.map((base64Image: string) => 
+          newImages.map((base64Image: string) =>
             uploadToCloudinary(`data:image/jpeg;base64,${base64Image}`)
           )
         );
       }
 
       // Collect image IDs of images to delete
-      const removedImages = imageChanges.filter(change => change.type === 'removed' && change.imageId);
+      const removedImages = imageChanges.filter(
+        (change) => change.type === 'removed' && change.imageId
+      );
       if (removedImages.length > 0) {
-        imageIdsToDelete.push(...removedImages.map(change => change.imageId!));
+        imageIdsToDelete.push(...removedImages.map((change) => change.imageId!));
       }
 
       // Delete removed images from Cloudinary FIRST (before database update)
@@ -373,30 +398,37 @@ export function usePostUpdate<T extends BaseFormData>({
                 method: 'POST',
                 headers: {
                   'Content-Type': 'application/json',
-                  'Authorization': `Bearer ${session.session.access_token}`,
+                  Authorization: `Bearer ${session.session.access_token}`,
                 },
                 body: JSON.stringify({
                   imageIds: imageIdsToDelete,
-                  folder: 'posts'
+                  folder: 'posts',
                 }),
               }
             );
 
             if (!response.ok) {
               const errorText = await response.text();
-              console.error('Failed to delete images from Cloudinary:', response.status, response.statusText, errorText);
+              console.error(
+                'Failed to delete images from Cloudinary:',
+                response.status,
+                response.statusText,
+                errorText
+              );
             } else {
               const result = await response.json();
               console.log('Image deletion results:', result);
               deletionResults = result;
-              
+
               // Show user feedback about deletion results
               if (result.results) {
                 const { successful, failed } = result.results;
                 if (successful.length > 0 && failed.length === 0) {
                   console.log(`Successfully deleted ${successful.length} images`);
                 } else if (successful.length > 0 && failed.length > 0) {
-                  console.log(`Partially successful: ${successful.length} deleted, ${failed.length} failed`);
+                  console.log(
+                    `Partially successful: ${successful.length} deleted, ${failed.length} failed`
+                  );
                   console.log('Failed images:', failed);
                 } else if (failed.length > 0) {
                   console.log(`Failed to delete ${failed.length} images:`, failed);
@@ -412,21 +444,21 @@ export function usePostUpdate<T extends BaseFormData>({
 
       // Build final image IDs array
       // For existing images, we need to extract the image IDs from the URLs
-             let finalImageIds = [...existingImageIds, ...uploadedImageIds];
-        
-        // If deletion was attempted, filter out failed deletions
+      let finalImageIds = [...existingImageIds, ...uploadedImageIds];
+
+      // If deletion was attempted, filter out failed deletions
       if (deletionResults && deletionResults.results) {
         const { successful, failed } = deletionResults.results;
-        
+
         // Map failed publicIds back to image IDs for comparison
         const failedPublicIds = failed.map((f: any) => f.publicId).filter(Boolean);
-        const failedImageIds = imageIdsToDelete.filter(imageId => {
+        const failedImageIds = imageIdsToDelete.filter((imageId) => {
           const publicId = `posts/${imageId}`;
           return failedPublicIds.includes(publicId);
         });
-        
+
         // Keep failed deletions in the final images array
-        finalImageIds = finalImageIds.filter(imgId => !failedImageIds.includes(imgId));
+        finalImageIds = finalImageIds.filter((imgId) => !failedImageIds.includes(imgId));
         console.log(`Keeping ${failedImageIds.length} failed deletions in database`);
       }
 
@@ -460,12 +492,12 @@ export function usePostUpdate<T extends BaseFormData>({
         console.error('Supabase error:', error);
         throw error;
       }
-      
+
       Alert.alert('Success', successMessage);
       router.back();
     } catch (error) {
       console.error('Error updating post:', error);
-      
+
       // Rollback: Delete newly uploaded images if database update failed
       if (uploadedImageIds.length > 0) {
         try {
@@ -478,11 +510,11 @@ export function usePostUpdate<T extends BaseFormData>({
                 method: 'POST',
                 headers: {
                   'Content-Type': 'application/json',
-                  'Authorization': `Bearer ${session.session.access_token}`,
+                  Authorization: `Bearer ${session.session.access_token}`,
                 },
                 body: JSON.stringify({
                   imageIds: uploadedImageIds,
-                  folder: 'posts'
+                  folder: 'posts',
                 }),
               }
             );
@@ -491,9 +523,9 @@ export function usePostUpdate<T extends BaseFormData>({
           console.error('Failed to rollback uploaded images:', rollbackError);
         }
       }
-      
+
       Alert.alert(
-        'Error', 
+        'Error',
         `${ERROR_MESSAGES.POST_UPDATE_FAILED} ${error instanceof Error ? error.message : ''}`
       );
     } finally {
@@ -510,6 +542,6 @@ export function usePostUpdate<T extends BaseFormData>({
     handleRemoveImage,
     handleInputChange,
     handleLocationChange,
-    handleUpdate
-  };  
-} 
+    handleUpdate,
+  };
+}

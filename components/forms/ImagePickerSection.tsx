@@ -27,37 +27,25 @@ export default function ImagePickerSection({
       <Text style={[styles.imageText, { color: theme.colors.onSurfaceVariant }]}>
         Images ({images.length}/{maxImages})
       </Text>
-      <ScrollView 
-        horizontal 
-        showsHorizontalScrollIndicator={false}
-        style={styles.scrollView}
-      >
+      <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.scrollView}>
         <View style={styles.imageContainer}>
           {images.length < maxImages && (
-            <TouchableOpacity 
-              style={[
-                styles.addButton,
-                { backgroundColor: theme.colors.surfaceVariant }
-              ]} 
-              onPress={onPickImage}
-            >
-              <MaterialCommunityIcons 
-                name="camera-plus" 
-                size={32} 
-                color={theme.colors.primary}
-              />
+            <TouchableOpacity
+              style={[styles.addButton, { backgroundColor: theme.colors.surfaceVariant }]}
+              onPress={onPickImage}>
+              <MaterialCommunityIcons name="camera-plus" size={32} color={theme.colors.primary} />
               <Text style={[styles.addButtonText, { color: theme.colors.onSurfaceVariant }]}>
                 Add Image
               </Text>
             </TouchableOpacity>
           )}
-          
+
           {images.map((image, index) => {
             // Check if the image is a URL, base64, or image ID
             const isUrl = image.startsWith('http');
             // Base64 strings are typically very long and contain alphanumeric characters
             const isBase64 = !isUrl && image.length > 100 && /^[A-Za-z0-9+/=]+$/.test(image);
-            
+
             let imageSource;
             if (isUrl) {
               imageSource = { uri: image };
@@ -68,7 +56,7 @@ export default function ImagePickerSection({
               const imageUrl = getCloudinaryUrl(image, 'posts');
               imageSource = imageUrl ? { uri: imageUrl } : `data:image/jpeg;base64,${image}`;
             }
-            
+
             return (
               <View key={index} style={styles.imageWrapper}>
                 <View style={styles.imageContent}>
@@ -144,4 +132,4 @@ const styles = StyleSheet.create({
     fontSize: 12,
     marginTop: 4,
   },
-}); 
+});

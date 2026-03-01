@@ -13,12 +13,12 @@ interface ProfileImageProps {
   tempImageUrl?: string | null;
 }
 
-const ProfileImage: React.FC<ProfileImageProps> = ({ 
-  imageId, 
-  size = 40, 
+const ProfileImage: React.FC<ProfileImageProps> = ({
+  imageId,
+  size = 40,
   folder = 'avatars',
   style,
-  tempImageUrl
+  tempImageUrl,
 }) => {
   const theme = useTheme();
   const [imageError, setImageError] = useState(false);
@@ -43,16 +43,17 @@ const ProfileImage: React.FC<ProfileImageProps> = ({
   };
 
   return (
-    <View style={[
-      styles.container, 
-      { 
-        width: size, 
-        height: size, 
-        borderRadius: size / 2,
-        backgroundColor: showPlaceholder ? theme.colors.surfaceVariant : 'transparent'
-      },
-      style
-    ]}>
+    <View
+      style={[
+        styles.container,
+        {
+          width: size,
+          height: size,
+          borderRadius: size / 2,
+          backgroundColor: showPlaceholder ? theme.colors.surfaceVariant : 'transparent',
+        },
+        style,
+      ]}>
       {imageUrl && !imageError ? (
         <ExpoImage
           source={{ uri: imageUrl }}
@@ -63,20 +64,20 @@ const ProfileImage: React.FC<ProfileImageProps> = ({
           onError={handleImageError}
         />
       ) : null}
-      
+
       {showPlaceholder && (
         <View style={styles.placeholderContainer}>
-          <MaterialCommunityIcons 
-            name="account" 
-            size={size * 0.5} 
-            color={theme.colors.onSurfaceVariant} 
+          <MaterialCommunityIcons
+            name="account"
+            size={size * 0.5}
+            color={theme.colors.onSurfaceVariant}
           />
           {imageError && (
             <View style={styles.errorIndicator}>
-              <MaterialCommunityIcons 
-                name="alert-circle" 
-                size={size * 0.25} 
-                color={theme.colors.error} 
+              <MaterialCommunityIcons
+                name="alert-circle"
+                size={size * 0.25}
+                color={theme.colors.error}
               />
             </View>
           )}

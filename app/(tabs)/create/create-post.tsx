@@ -8,7 +8,13 @@ import Header from '../../../components/layout/Header';
 import BasePostForm from '../../../components/forms/BasePostForm';
 import CategorySelector from '../../../components/forms/CategorySelector';
 import SubcategorySelector from '../../../components/forms/SubcategorySelector';
-import { PostFormData, transformPostForm, validatePostForm, VALIDATION_LIMITS, DEFAULT_FORM_VALUES } from '../../../types/forms';
+import {
+  PostFormData,
+  transformPostForm,
+  validatePostForm,
+  VALIDATION_LIMITS,
+  DEFAULT_FORM_VALUES,
+} from '../../../types/forms';
 import { useCountryStore } from '../../../store/useCountryStore';
 import { getCurrencyForCountry, COUNTRY_DATA } from '../../../constants/CountryData';
 import LoadingScreen from '../../../components/ui/LoadingScreen';
@@ -36,7 +42,7 @@ const initialState: PostFormData = {
   location: {
     city: '',
     address: undefined,
-    country: DEFAULT_FORM_VALUES.COUNTRY
+    country: DEFAULT_FORM_VALUES.COUNTRY,
   },
   make: '',
   model: '',
@@ -49,7 +55,7 @@ export default function CreatePostScreen() {
   const country = useCountryStore((state) => state.country);
   const currency = getCurrencyForCountry(country);
   const countryName = country ? COUNTRY_DATA[country].name : DEFAULT_FORM_VALUES.COUNTRY;
-  
+
   const [formState, setFormState] = useState<PostFormData>({
     ...initialState,
     currency,
@@ -60,14 +66,16 @@ export default function CreatePostScreen() {
   });
   const [isUpdateMode, setIsUpdateMode] = useState(false);
   const [postToUpdate, setPostToUpdate] = useState<Post | null>(null);
-  const { models, loadingModels } = useVehicleModels(formState.category === 'vehicles' ? formState.make : '');
+  const { models, loadingModels } = useVehicleModels(
+    formState.category === 'vehicles' ? formState.make : ''
+  );
 
   // Update currency and country when country changes
   useEffect(() => {
     if (country && !isUpdateMode) {
       const newCurrency = getCurrencyForCountry(country);
       const newCountryName = COUNTRY_DATA[country].name;
-      setFormState(prev => ({
+      setFormState((prev) => ({
         ...prev,
         currency: newCurrency,
         location: {
@@ -96,7 +104,7 @@ export default function CreatePostScreen() {
     if (typeof params.category !== 'string') return;
 
     const normalizedCategory = normalizeCategoryValue(params.category as string | undefined);
-    setFormState(prev => {
+    setFormState((prev) => {
       if (prev.category === normalizedCategory) {
         return prev;
       }
@@ -118,12 +126,12 @@ export default function CreatePostScreen() {
     handleRemoveImage: createHandleRemoveImage,
     handleInputChange: createHandleInputChange,
     handleLocationChange: createHandleLocationChange,
-    handleSubmit: createHandleSubmit
+    handleSubmit: createHandleSubmit,
   } = usePostForm<PostFormData>({
     postType: 'post',
     transformForm: transformPostForm,
     validateForm: validatePostForm,
-    successMessage: 'Post submitted! We will review it soon before publishing.'
+    successMessage: 'Post submitted! We will review it soon before publishing.',
   });
 
   const {
@@ -134,12 +142,12 @@ export default function CreatePostScreen() {
     handleRemoveImage: updateHandleRemoveImage,
     handleInputChange: updateHandleInputChange,
     handleLocationChange: updateHandleLocationChange,
-    handleUpdate
+    handleUpdate,
   } = usePostUpdate<PostFormData>({
     postType: 'post',
     transformForm: transformPostForm,
     validateForm: validatePostForm,
-    successMessage: 'Post updated successfully!'
+    successMessage: 'Post updated successfully!',
   });
 
   // Initialize form with post data if in update mode
@@ -156,45 +164,53 @@ export default function CreatePostScreen() {
   const handlePickImage = isUpdateMode ? updateHandlePickImage : createHandlePickImage;
   const handleRemoveImage = isUpdateMode ? updateHandleRemoveImage : createHandleRemoveImage;
   const handleInputChange = isUpdateMode ? updateHandleInputChange : createHandleInputChange;
-  const handleLocationChange = isUpdateMode ? updateHandleLocationChange : createHandleLocationChange;
-
-
+  const handleLocationChange = isUpdateMode
+    ? updateHandleLocationChange
+    : createHandleLocationChange;
 
   const handleImagePick = () => {
-    Alert.alert(
-      'Select Image',
-      'Choose an option',
-      [
-        {
-          text: 'Cancel',
-          style: 'cancel',
-        },
-        {
-          text: 'Choose from Gallery',
-          onPress: () => handlePickImage(formState.images, (images) => setFormState(prev => ({ ...prev, images })), 'gallery'),
-        },
-        {
-          text: 'Take Picture',
-          onPress: () => handlePickImage(formState.images, (images) => setFormState(prev => ({ ...prev, images })), 'camera'),
-        },
-      ]
-    );
+    Alert.alert('Select Image', 'Choose an option', [
+      {
+        text: 'Cancel',
+        style: 'cancel',
+      },
+      {
+        text: 'Choose from Gallery',
+        onPress: () =>
+          handlePickImage(
+            formState.images,
+            (images) => setFormState((prev) => ({ ...prev, images })),
+            'gallery'
+          ),
+      },
+      {
+        text: 'Take Picture',
+        onPress: () =>
+          handlePickImage(
+            formState.images,
+            (images) => setFormState((prev) => ({ ...prev, images })),
+            'camera'
+          ),
+      },
+    ]);
   };
 
   const handleImageRemove = (index: number) => {
-    handleRemoveImage(index, formState.images, (images) => setFormState(prev => ({ ...prev, images })));
+    handleRemoveImage(index, formState.images, (images) =>
+      setFormState((prev) => ({ ...prev, images }))
+    );
   };
 
   const handleFormInputChange = (field: keyof PostFormData, value: string | string[]) => {
     handleInputChange(field, value, formState, setFormState);
-    
+
     // Clear model when make changes
     if (field === 'make') {
-      setFormState(prev => ({ ...prev, model: '' }));
+      setFormState((prev) => ({ ...prev, model: '' }));
     }
 
     if (field === 'category') {
-      setFormState(prev => ({
+      setFormState((prev) => ({
         ...prev,
         subcategory: '',
         make: '',
@@ -217,17 +233,19 @@ export default function CreatePostScreen() {
   };
 
   const isVehicleCategory = formState.category === 'vehicles';
-  const pageTitle = isUpdateMode ? "Update Post" : "Create Post";
+  const pageTitle = isUpdateMode ? 'Update Post' : 'Create Post';
   const yearOptions = useMemo(
     () => [
       { label: 'Not Specified', value: '' },
-      ...YEARS.map(year => ({ label: year, value: year }))
+      ...YEARS.map((year) => ({ label: year, value: year })),
     ],
     []
   );
 
   if (loading) {
-    return <LoadingScreen message={isUpdateMode ? "Updating your post..." : "Creating your post..."} />;
+    return (
+      <LoadingScreen message={isUpdateMode ? 'Updating your post...' : 'Creating your post...'} />
+    );
   }
 
   const renderCategoryFields = () => (
@@ -250,7 +268,7 @@ export default function CreatePostScreen() {
       {isVehicleCategory ? (
         <>
           <DropdownComponent
-            data={MAKES.map(make => ({ label: make, value: make }))}
+            data={MAKES.map((make) => ({ label: make, value: make }))}
             value={formState.make}
             onChange={(value: string | null) => handleFormInputChange('make', value || '')}
             placeholder="Make"
@@ -258,15 +276,11 @@ export default function CreatePostScreen() {
           />
 
           <DropdownComponent
-            data={models.map(model => ({ label: model.name, value: model.name }))}
+            data={models.map((model) => ({ label: model.name, value: model.name }))}
             value={formState.model}
             onChange={(value: string | null) => handleFormInputChange('model', value || '')}
             placeholder={
-              !formState.make
-                ? "Select make first"
-                : loadingModels
-                  ? "Loading models..."
-                  : "Model"
+              !formState.make ? 'Select make first' : loadingModels ? 'Loading models...' : 'Model'
             }
             error={errors.model}
             disabled={!formState.make || loadingModels}
@@ -306,8 +320,7 @@ export default function CreatePostScreen() {
       <KeyboardAvoidingView
         style={{ flex: 1 }}
         behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-        keyboardVerticalOffset={Platform.OS === 'ios' ? 0 : 20}
-      >
+        keyboardVerticalOffset={Platform.OS === 'ios' ? 0 : 20}>
         <View style={[formStyles.container, { backgroundColor: theme.colors.background }]}>
           <Header title={pageTitle} />
           <BasePostForm<PostFormData>
@@ -318,16 +331,11 @@ export default function CreatePostScreen() {
             onLocationChange={handleFormLocationChange}
             onPickImage={handleImagePick}
             onRemoveImage={handleImageRemove}
-            maxImages={VALIDATION_LIMITS.IMAGES_PER_POST}
-          >
+            maxImages={VALIDATION_LIMITS.IMAGES_PER_POST}>
             {renderCategoryFields()}
           </BasePostForm>
-          <Button
-            mode="contained"
-            onPress={handleFormSubmit}
-            style={formStyles.submitButton}
-          >
-            {isUpdateMode ? "Update Post" : "Create"}
+          <Button mode="contained" onPress={handleFormSubmit} style={formStyles.submitButton}>
+            {isUpdateMode ? 'Update Post' : 'Create'}
           </Button>
         </View>
       </KeyboardAvoidingView>

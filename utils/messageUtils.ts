@@ -18,7 +18,7 @@ export const groupMessages = (messages: Message[]): GroupedMessage[] => {
   messages.forEach((message, index) => {
     const messageDate = new Date(message.created_at);
     const messageDateStr = format(messageDate, 'yyyy-MM-dd');
-    
+
     // Add date separator if it's a new date
     if (currentDate !== messageDateStr) {
       grouped.push({
@@ -32,12 +32,14 @@ export const groupMessages = (messages: Message[]): GroupedMessage[] => {
     // Check if this message is first/last in a group
     const prevMessage = index > 0 ? messages[index - 1] : null;
     const nextMessage = index < messages.length - 1 ? messages[index + 1] : null;
-    
-    const isFirstInGroup = !prevMessage || 
+
+    const isFirstInGroup =
+      !prevMessage ||
       message.sender_id !== prevMessage.sender_id ||
       !isSameMinute(messageDate, new Date(prevMessage.created_at));
-    
-    const isLastInGroup = !nextMessage ||
+
+    const isLastInGroup =
+      !nextMessage ||
       message.sender_id !== nextMessage.sender_id ||
       !isSameMinute(messageDate, new Date(nextMessage.created_at));
 
@@ -67,7 +69,7 @@ export const formatMessageTime = (date: string): string => {
 
 export const formatDateSeparator = (date: string): string => {
   const messageDate = new Date(date);
-  
+
   if (isToday(messageDate)) {
     return 'Today';
   } else if (isYesterday(messageDate)) {
@@ -77,21 +79,24 @@ export const formatDateSeparator = (date: string): string => {
   }
 };
 
-export const shouldShowDateSeparator = (currentMessage: Message, previousMessage?: Message): boolean => {
+export const shouldShowDateSeparator = (
+  currentMessage: Message,
+  previousMessage?: Message
+): boolean => {
   if (!previousMessage) return true;
-  
+
   const currentDate = new Date(currentMessage.created_at);
   const previousDate = new Date(previousMessage.created_at);
-  
+
   return !isSameDay(currentDate, previousDate);
 };
 
 export const isFirstInGroup = (currentMessage: Message, previousMessage?: Message): boolean => {
   if (!previousMessage) return true;
-  
+
   const currentDate = new Date(currentMessage.created_at);
   const previousDate = new Date(previousMessage.created_at);
-  
+
   return (
     currentMessage.sender_id !== previousMessage.sender_id ||
     !isSameMinute(currentDate, previousDate)
@@ -100,12 +105,9 @@ export const isFirstInGroup = (currentMessage: Message, previousMessage?: Messag
 
 export const isLastInGroup = (currentMessage: Message, nextMessage?: Message): boolean => {
   if (!nextMessage) return true;
-  
+
   const currentDate = new Date(currentMessage.created_at);
   const nextDate = new Date(nextMessage.created_at);
-  
-  return (
-    currentMessage.sender_id !== nextMessage.sender_id ||
-    !isSameMinute(currentDate, nextDate)
-  );
-}; 
+
+  return currentMessage.sender_id !== nextMessage.sender_id || !isSameMinute(currentDate, nextDate);
+};

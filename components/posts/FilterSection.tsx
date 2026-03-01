@@ -1,4 +1,13 @@
-import { View, StyleSheet, ScrollView, Animated, LayoutAnimation, Platform, UIManager, Dimensions } from 'react-native';
+import {
+  View,
+  StyleSheet,
+  ScrollView,
+  Animated,
+  LayoutAnimation,
+  Platform,
+  UIManager,
+  Dimensions,
+} from 'react-native';
 import React, { useState, useRef, useCallback, useMemo } from 'react';
 import { Text, Button, useTheme, TextInput, Divider, SegmentedButtons } from 'react-native-paper';
 import Slider from 'rn-range-slider';
@@ -82,13 +91,16 @@ export default function FilterSection({ onSearch, onFilter, onLogoPress }: Filte
   );
 
   const cityOptions = useMemo(
-    () => [{ label: 'All Cities', value: '' }, ...cities.map(city => ({ label: city, value: city }))],
+    () => [
+      { label: 'All Cities', value: '' },
+      ...cities.map((city) => ({ label: city, value: city })),
+    ],
     [cities]
   );
 
   const subcategoryOptions = useMemo(() => {
     if (!filters.category) return [];
-    const options = getSubcategories(filters.category).map(value => ({
+    const options = getSubcategories(filters.category).map((value) => ({
       label: formatCategoryLabel(value),
       value,
     }));
@@ -96,17 +108,23 @@ export default function FilterSection({ onSearch, onFilter, onLogoPress }: Filte
   }, [filters.category]);
 
   const makeOptions = useMemo(
-    () => [{ label: 'All Makes', value: '' }, ...MAKES.map(make => ({ label: make, value: make }))],
+    () => [
+      { label: 'All Makes', value: '' },
+      ...MAKES.map((make) => ({ label: make, value: make })),
+    ],
     []
   );
 
   const modelOptions = useMemo(
-    () => [{ label: 'All Models', value: '' }, ...models.map(model => ({ label: model.name, value: model.name }))],
+    () => [
+      { label: 'All Models', value: '' },
+      ...models.map((model) => ({ label: model.name, value: model.name })),
+    ],
     [models]
   );
 
   const handleYearChange = useCallback((low: number, high: number) => {
-    setFilters(prev => ({
+    setFilters((prev) => ({
       ...prev,
       yearRange: {
         min: Math.floor(low),
@@ -116,7 +134,7 @@ export default function FilterSection({ onSearch, onFilter, onLogoPress }: Filte
   }, []);
 
   const handlePriceChange = useCallback((field: 'min' | 'max', value: string) => {
-    setFilters(prev => ({
+    setFilters((prev) => ({
       ...prev,
       priceRange: {
         ...prev.priceRange,
@@ -126,14 +144,14 @@ export default function FilterSection({ onSearch, onFilter, onLogoPress }: Filte
   }, []);
 
   const handleFilterChange = useCallback((field: keyof FilterOptions, value: any) => {
-    setFilters(prev => ({
+    setFilters((prev) => ({
       ...prev,
       [field]: value,
     }));
   }, []);
 
   const handleCategoryChange = useCallback((value: string) => {
-    setFilters(prev => ({
+    setFilters((prev) => ({
       ...prev,
       category: value ? (value as CategoryValue) : null,
       subcategory: null,
@@ -184,7 +202,7 @@ export default function FilterSection({ onSearch, onFilter, onLogoPress }: Filte
 
   const toggleExpand = () => {
     animateLayout();
-    setIsExpanded(prev => !prev);
+    setIsExpanded((prev) => !prev);
   };
 
   const closeFilters = useCallback(() => {
@@ -220,16 +238,21 @@ export default function FilterSection({ onSearch, onFilter, onLogoPress }: Filte
       <Text variant="titleSmall" style={[styles.sectionTitle, { color: theme.colors.onSurface }]}>
         Basic Filters
       </Text>
-      
+
       {/* Listing Type */}
       <View style={styles.inputGroup}>
-        <Text variant="bodySmall" style={[styles.inputLabel, { color: theme.colors.onSurfaceVariant }]}>
+        <Text
+          variant="bodySmall"
+          style={[styles.inputLabel, { color: theme.colors.onSurfaceVariant }]}>
           Listing Type
         </Text>
         <SegmentedButtons
           value={filters.listingType ?? 'all'}
           onValueChange={(value) =>
-            handleFilterChange('listingType', value === 'all' ? null : (value as FilterOptions['listingType']))
+            handleFilterChange(
+              'listingType',
+              value === 'all' ? null : (value as FilterOptions['listingType'])
+            )
           }
           buttons={[
             { value: 'all', label: 'All' },
@@ -243,7 +266,9 @@ export default function FilterSection({ onSearch, onFilter, onLogoPress }: Filte
 
       {/* City */}
       <View style={styles.inputGroup}>
-        <Text variant="bodySmall" style={[styles.inputLabel, { color: theme.colors.onSurfaceVariant }]}>
+        <Text
+          variant="bodySmall"
+          style={[styles.inputLabel, { color: theme.colors.onSurfaceVariant }]}>
           City
         </Text>
         <Dropdown
@@ -274,7 +299,9 @@ export default function FilterSection({ onSearch, onFilter, onLogoPress }: Filte
 
       {/* Price Range */}
       <View style={styles.inputGroup}>
-        <Text variant="bodySmall" style={[styles.inputLabel, { color: theme.colors.onSurfaceVariant }]}>
+        <Text
+          variant="bodySmall"
+          style={[styles.inputLabel, { color: theme.colors.onSurfaceVariant }]}>
           Price Range
         </Text>
         <View style={styles.priceInputs}>
@@ -313,7 +340,9 @@ export default function FilterSection({ onSearch, onFilter, onLogoPress }: Filte
         {isVehicleCategory ? (
           <>
             <View style={styles.inputGroup}>
-              <Text variant="bodySmall" style={[styles.inputLabel, { color: theme.colors.onSurfaceVariant }]}>
+              <Text
+                variant="bodySmall"
+                style={[styles.inputLabel, { color: theme.colors.onSurfaceVariant }]}>
                 Make
               </Text>
               <Dropdown
@@ -328,7 +357,9 @@ export default function FilterSection({ onSearch, onFilter, onLogoPress }: Filte
             </View>
 
             <View style={styles.inputGroup}>
-              <Text variant="bodySmall" style={[styles.inputLabel, { color: theme.colors.onSurfaceVariant }]}>
+              <Text
+                variant="bodySmall"
+                style={[styles.inputLabel, { color: theme.colors.onSurfaceVariant }]}>
                 Model
               </Text>
               <Dropdown
@@ -348,7 +379,9 @@ export default function FilterSection({ onSearch, onFilter, onLogoPress }: Filte
             </View>
 
             <View style={styles.inputGroup}>
-              <Text variant="bodySmall" style={[styles.inputLabel, { color: theme.colors.onSurfaceVariant }]}>
+              <Text
+                variant="bodySmall"
+                style={[styles.inputLabel, { color: theme.colors.onSurfaceVariant }]}>
                 Year Range: {filters.yearRange.min} - {filters.yearRange.max}
               </Text>
               <View style={styles.sliderContainer}>
@@ -359,9 +392,17 @@ export default function FilterSection({ onSearch, onFilter, onLogoPress }: Filte
                   high={filters.yearRange.max}
                   step={1}
                   onValueChanged={handleYearChange}
-                  renderThumb={() => <View style={[styles.thumb, { backgroundColor: theme.colors.primary }]} />}
-                  renderRail={() => <View style={[styles.rail, { backgroundColor: theme.colors.outlineVariant }]} />}
-                  renderRailSelected={() => <View style={[styles.railSelected, { backgroundColor: theme.colors.primary }]} />}
+                  renderThumb={() => (
+                    <View style={[styles.thumb, { backgroundColor: theme.colors.primary }]} />
+                  )}
+                  renderRail={() => (
+                    <View style={[styles.rail, { backgroundColor: theme.colors.outlineVariant }]} />
+                  )}
+                  renderRailSelected={() => (
+                    <View
+                      style={[styles.railSelected, { backgroundColor: theme.colors.primary }]}
+                    />
+                  )}
                 />
               </View>
             </View>
@@ -369,7 +410,9 @@ export default function FilterSection({ onSearch, onFilter, onLogoPress }: Filte
         ) : (
           <>
             <View style={styles.inputGroup}>
-              <Text variant="bodySmall" style={[styles.inputLabel, { color: theme.colors.onSurfaceVariant }]}>
+              <Text
+                variant="bodySmall"
+                style={[styles.inputLabel, { color: theme.colors.onSurfaceVariant }]}>
                 Brand / Make
               </Text>
               <TextInput
@@ -382,7 +425,9 @@ export default function FilterSection({ onSearch, onFilter, onLogoPress }: Filte
             </View>
 
             <View style={styles.inputGroup}>
-              <Text variant="bodySmall" style={[styles.inputLabel, { color: theme.colors.onSurfaceVariant }]}>
+              <Text
+                variant="bodySmall"
+                style={[styles.inputLabel, { color: theme.colors.onSurfaceVariant }]}>
                 Model / Variant
               </Text>
               <TextInput
@@ -424,13 +469,12 @@ export default function FilterSection({ onSearch, onFilter, onLogoPress }: Filte
             dense
           />
         </Animated.View>
-        
+
         <Button
           mode="contained"
           onPress={toggleExpand}
-          icon={isExpanded ? "chevron-up" : "chevron-down"}
-          style={styles.filterButton}
-        >
+          icon={isExpanded ? 'chevron-up' : 'chevron-down'}
+          style={styles.filterButton}>
           Filters
         </Button>
       </View>
@@ -438,11 +482,10 @@ export default function FilterSection({ onSearch, onFilter, onLogoPress }: Filte
       {/* Expandable Filter Section */}
       {isExpanded && (
         <View style={[styles.expandableContent, { maxHeight: windowHeight * 0.7 }]}>
-          <ScrollView 
+          <ScrollView
             style={styles.scrollContent}
             showsVerticalScrollIndicator={false}
-            nestedScrollEnabled={true}
-          >
+            nestedScrollEnabled={true}>
             {renderCommonInputs()}
             {categoryInputs && (
               <>
@@ -450,21 +493,13 @@ export default function FilterSection({ onSearch, onFilter, onLogoPress }: Filte
                 {categoryInputs}
               </>
             )}
-            
+
             {/* Action Buttons */}
             <View style={styles.actionButtons}>
-              <Button
-                mode="outlined"
-                onPress={clearFilters}
-                style={styles.clearButton}
-              >
+              <Button mode="outlined" onPress={clearFilters} style={styles.clearButton}>
                 Clear All
               </Button>
-              <Button
-                mode="contained"
-                onPress={applyFilters}
-                style={styles.applyButton}
-              >
+              <Button mode="contained" onPress={applyFilters} style={styles.applyButton}>
                 Apply Filters
               </Button>
             </View>
@@ -568,4 +603,4 @@ const styles = StyleSheet.create({
   textField: {
     backgroundColor: 'transparent',
   },
-}); 
+});

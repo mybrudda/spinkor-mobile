@@ -9,8 +9,7 @@ export default function ProfileLayout() {
       screenOptions={{
         headerShown: false,
         contentStyle: { backgroundColor: theme.colors.background },
-      }}
-    >
+      }}>
       <Stack.Screen name="index" />
       <Stack.Screen name="my-posts" />
       <Stack.Screen name="saved-posts" />
@@ -18,4 +17,4 @@ export default function ProfileLayout() {
       <Stack.Screen name="BlockedUsers" />
     </Stack>
   );
-} 
+}

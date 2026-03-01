@@ -22,7 +22,14 @@ interface PostCardProps {
   cardStyle?: object;
 }
 
-export default function PostCard({ post, showMenu = false, onDelete, onUpdate, onUnsave, cardStyle }: PostCardProps) {
+export default function PostCard({
+  post,
+  showMenu = false,
+  onDelete,
+  onUpdate,
+  onUnsave,
+  cardStyle,
+}: PostCardProps) {
   const theme = useTheme();
   const { user } = useAuthStore();
   const [imageError, setImageError] = useState(false);
@@ -33,7 +40,7 @@ export default function PostCard({ post, showMenu = false, onDelete, onUpdate, o
     postId: post.id,
     userId: post.user_id,
     onUnsave,
-    showSuccessAlerts: true
+    showSuccessAlerts: true,
   });
 
   const openMenu = () => setMenuVisible(true);
@@ -61,12 +68,7 @@ export default function PostCard({ post, showMenu = false, onDelete, onUpdate, o
 
     return (
       <View style={styles.detailsContainer}>
-        <Text
-          variant="bodySmall"
-          style={styles.detailValue}
-          numberOfLines={1}
-          ellipsizeMode="tail"
-        >
+        <Text variant="bodySmall" style={styles.detailValue} numberOfLines={1} ellipsizeMode="tail">
           {makeModel}
           {yearSuffix}
         </Text>
@@ -75,13 +77,17 @@ export default function PostCard({ post, showMenu = false, onDelete, onUpdate, o
   };
 
   // Get the first image URL from the image ID
-  const firstImageUrl = post.image_ids && post.image_ids.length > 0 
-    ? getCloudinaryUrl(post.image_ids[0], 'posts') 
-    : null;
+  const firstImageUrl =
+    post.image_ids && post.image_ids.length > 0
+      ? getCloudinaryUrl(post.image_ids[0], 'posts')
+      : null;
 
   return (
     <View style={styles.container}>
-      <Pressable onPress={() => router.push({ pathname: '/PostDetails', params: { post: JSON.stringify(post) } })}>
+      <Pressable
+        onPress={() =>
+          router.push({ pathname: '/PostDetails', params: { post: JSON.stringify(post) } })
+        }>
         <Card style={[cardStyle]}>
           <View style={styles.cardContentWrapper}>
             <View style={styles.imageContainer}>
@@ -94,20 +100,24 @@ export default function PostCard({ post, showMenu = false, onDelete, onUpdate, o
                 onError={() => setImageError(true)}
               />
               {imageError && (
-                <View style={[styles.errorOverlay, { backgroundColor: theme.colors.surfaceVariant }]}>
-                  <MaterialCommunityIcons name="image-off" size={24} color={theme.colors.onSurfaceVariant} />
+                <View
+                  style={[styles.errorOverlay, { backgroundColor: theme.colors.surfaceVariant }]}>
+                  <MaterialCommunityIcons
+                    name="image-off"
+                    size={24}
+                    color={theme.colors.onSurfaceVariant}
+                  />
                   <Text style={{ color: theme.colors.onSurfaceVariant }}>Image unavailable</Text>
                 </View>
               )}
               <View style={[styles.imageOverlay, { backgroundColor: appColors.imageOverlay }]}>
-                <Text 
+                <Text
                   numberOfLines={1}
-                  style={{ color: appColors.imageOverlayText, fontWeight: 'bold', fontSize: 14 }}
-                >
+                  style={{ color: appColors.imageOverlayText, fontWeight: 'bold', fontSize: 14 }}>
                   {formatPrice(post.price, post.currency)}
                 </Text>
               </View>
-              
+
               {/* Top-right Icon: Save or Menu, same position and style */}
               <View style={styles.actionIconContainer}>
                 {showMenu ? (
@@ -119,25 +129,19 @@ export default function PostCard({ post, showMenu = false, onDelete, onUpdate, o
                         icon="dots-vertical"
                         size={14}
                         onPress={openMenu}
-                        style={[styles.actionIcon, { backgroundColor: theme.colors.primaryContainer }]}
+                        style={[
+                          styles.actionIcon,
+                          { backgroundColor: theme.colors.primaryContainer },
+                        ]}
                         iconColor={theme.colors.primary}
                       />
-                    }
-                  >
-                    <Menu.Item 
-                      onPress={handleUpdate} 
-                      title="Update"
-                      leadingIcon="pencil"
-                    />
-                    <Menu.Item 
-                      onPress={handleDelete} 
-                      title="Delete"
-                      leadingIcon="delete"
-                    />
+                    }>
+                    <Menu.Item onPress={handleUpdate} title="Update" leadingIcon="pencil" />
+                    <Menu.Item onPress={handleDelete} title="Delete" leadingIcon="delete" />
                   </Menu>
                 ) : (
                   <IconButton
-                    icon={isSaved ? "bookmark" : "bookmark-outline"}
+                    icon={isSaved ? 'bookmark' : 'bookmark-outline'}
                     size={14}
                     iconColor={isSaved ? appColors.savedBookmark : theme.colors.primary}
                     style={[styles.actionIcon, { backgroundColor: theme.colors.primaryContainer }]}
@@ -150,41 +154,42 @@ export default function PostCard({ post, showMenu = false, onDelete, onUpdate, o
             </View>
 
             <Card.Content style={styles.cardContent}>
-              <Text 
-                variant="titleMedium" 
-                numberOfLines={1} 
+              <Text
+                variant="titleMedium"
+                numberOfLines={1}
                 ellipsizeMode="tail"
-                style={styles.title}
-              >
+                style={styles.title}>
                 {post.title}
               </Text>
-              
+
               {renderPostDetails(post.details)}
 
               <View style={styles.footerRow}>
                 <View style={{ flex: 1 }}>
                   <View style={styles.locationContainer}>
-                    <MaterialCommunityIcons name="map-marker" size={16} color={theme.colors.onSurfaceVariant} />
-                    <Text 
-                      variant="bodySmall" 
+                    <MaterialCommunityIcons
+                      name="map-marker"
+                      size={16}
+                      color={theme.colors.onSurfaceVariant}
+                    />
+                    <Text
+                      variant="bodySmall"
                       numberOfLines={1}
-                      style={[styles.detailValue, styles.locationText]}
-                    >
+                      style={[styles.detailValue, styles.locationText]}>
                       {post.location.city}
                     </Text>
                   </View>
-                  <Text 
-                    variant="bodySmall" 
+                  <Text
+                    variant="bodySmall"
                     numberOfLines={1}
-                    style={[styles.date, { color: theme.colors.onSurfaceVariant }]}
-                  >
+                    style={[styles.date, { color: theme.colors.onSurfaceVariant }]}>
                     {formatDate(post.created_at)}
                   </Text>
                 </View>
               </View>
             </Card.Content>
           </View>
-          
+
           {/* Menu is now handled inline above */}
         </Card>
       </Pressable>

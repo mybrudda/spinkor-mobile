@@ -15,14 +15,13 @@ export default function FeaturesSection({
 }: FeaturesSectionProps) {
   return (
     <View>
-      <Text variant="titleSmall" style={styles.featuresTitle}>Features</Text>
+      <Text variant="titleSmall" style={styles.featuresTitle}>
+        Features
+      </Text>
       <View style={styles.checkboxContainer}>
         {features.map((feature) => (
           <View key={feature} style={styles.checkboxWrapper}>
-            <Pressable 
-              style={styles.checkboxRow}
-              onPress={() => onToggleFeature(feature)}
-            >
+            <Pressable style={styles.checkboxRow} onPress={() => onToggleFeature(feature)}>
               <Checkbox
                 status={selectedFeatures.includes(feature) ? 'checked' : 'unchecked'}
                 onPress={() => onToggleFeature(feature)}
@@ -60,4 +59,4 @@ const styles = StyleSheet.create({
     marginLeft: 8,
     flex: 1,
   },
-}); 
+});

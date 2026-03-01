@@ -23,4 +23,4 @@ export const formStyles = StyleSheet.create({
     height: 50,
     justifyContent: 'center',
   },
-}); 
+});

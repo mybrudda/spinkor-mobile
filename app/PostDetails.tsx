@@ -1,6 +1,25 @@
-import { View, StyleSheet, ScrollView, Dimensions, Linking, Image, Alert, TouchableOpacity } from 'react-native';
+import {
+  View,
+  StyleSheet,
+  ScrollView,
+  Dimensions,
+  Linking,
+  Image,
+  Alert,
+  TouchableOpacity,
+} from 'react-native';
 import React, { useEffect, useState } from 'react';
-import { Text, Surface, useTheme, ActivityIndicator, Button, Divider, Chip, Portal, IconButton } from 'react-native-paper';
+import {
+  Text,
+  Surface,
+  useTheme,
+  ActivityIndicator,
+  Button,
+  Divider,
+  Chip,
+  Portal,
+  IconButton,
+} from 'react-native-paper';
 import { useLocalSearchParams, router } from 'expo-router';
 import { supabase } from '../supabaseClient';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
@@ -23,7 +42,9 @@ const DetailItem = ({ label, value }: { label: string; value: string }) => {
   const theme = useTheme();
   return (
     <View style={styles.detailItem}>
-      <Text variant="bodySmall" style={[styles.detailLabel, { color: theme.colors.onSurfaceVariant }]}>
+      <Text
+        variant="bodySmall"
+        style={[styles.detailLabel, { color: theme.colors.onSurfaceVariant }]}>
         {label}
       </Text>
       <Text variant="bodyMedium" style={[styles.detailValue, { color: theme.colors.onSurface }]}>
@@ -39,21 +60,23 @@ export default function PostDetails() {
   const [post, setPost] = useState<Post | null>(null);
   const [loading, setLoading] = useState(true);
   const [showLoginModal, setShowLoginModal] = useState(false);
-  const [loginModalAction, setLoginModalAction] = useState<'message' | 'save' | 'report'>('message');
+  const [loginModalAction, setLoginModalAction] = useState<'message' | 'save' | 'report'>(
+    'message'
+  );
   const [showReportDialog, setShowReportDialog] = useState(false);
   const [imageError, setImageError] = useState(false);
   const width = Dimensions.get('window').width;
   const { user } = useAuthStore();
   const [carouselIndex, setCarouselIndex] = useState(0);
-  
+
   // Memoize filtered images to avoid recalculating on every render
   const filteredImages = React.useMemo(() => {
     if (!post?.image_ids) return [];
     // Convert image IDs to URLs
     return post.image_ids
-      .filter(img => img && img.trim() !== '')
-      .map(imgId => getCloudinaryUrl(imgId, 'posts'))
-      .filter(url => url !== null) as string[];
+      .filter((img) => img && img.trim() !== '')
+      .map((imgId) => getCloudinaryUrl(imgId, 'posts'))
+      .filter((url) => url !== null) as string[];
   }, [post?.image_ids]);
 
   // Optimize carousel index update callback
@@ -69,29 +92,38 @@ export default function PostDetails() {
       setLoginModalAction('save');
       setShowLoginModal(true);
     },
-    showSuccessAlerts: false
+    showSuccessAlerts: false,
   });
 
   // Move renderCarouselItem outside to prevent recreation
-  const renderCarouselItem = React.useCallback(({ item }: CarouselRenderItemInfo) => (
-    <View style={styles.carouselImageContainer}>
-      <ExpoImage
-        source={{ uri: item }}
-        style={styles.carouselImage}
-        contentFit="cover"
-        transition={300}
-        placeholder={PLACEHOLDER_BLURHASH}
-        cachePolicy="memory-disk"
-        onError={() => setImageError(true)}
-      />
-      {imageError && (
-        <View style={[styles.errorOverlay, { backgroundColor: theme.colors.surfaceVariant }]}>
-          <MaterialCommunityIcons name="image-off" size={48} color={theme.colors.onSurfaceVariant} />
-          <Text style={[styles.imageErrorText, { color: theme.colors.onSurfaceVariant }]}>Image unavailable</Text>
-        </View>
-      )}
-    </View>
-  ), [imageError, theme.colors.surfaceVariant, theme.colors.onSurfaceVariant]);
+  const renderCarouselItem = React.useCallback(
+    ({ item }: CarouselRenderItemInfo) => (
+      <View style={styles.carouselImageContainer}>
+        <ExpoImage
+          source={{ uri: item }}
+          style={styles.carouselImage}
+          contentFit="cover"
+          transition={300}
+          placeholder={PLACEHOLDER_BLURHASH}
+          cachePolicy="memory-disk"
+          onError={() => setImageError(true)}
+        />
+        {imageError && (
+          <View style={[styles.errorOverlay, { backgroundColor: theme.colors.surfaceVariant }]}>
+            <MaterialCommunityIcons
+              name="image-off"
+              size={48}
+              color={theme.colors.onSurfaceVariant}
+            />
+            <Text style={[styles.imageErrorText, { color: theme.colors.onSurfaceVariant }]}>
+              Image unavailable
+            </Text>
+          </View>
+        )}
+      </View>
+    ),
+    [imageError, theme.colors.surfaceVariant, theme.colors.onSurfaceVariant]
+  );
 
   useEffect(() => {
     if (params.post) {
@@ -121,48 +153,43 @@ export default function PostDetails() {
 
     // Prevent self-messaging
     if (user.id === post.user.id) {
-      Alert.alert("Cannot Message", "You cannot message yourself on your own post");
+      Alert.alert('Cannot Message', 'You cannot message yourself on your own post');
       return;
     }
 
     try {
       // Check if the seller has blocked the current user
-      const { data: isBlocked, error: blockCheckError } = await supabase
-        .rpc('is_user_blocked', {
-          blocker_id: post.user.id,
-          blocked_id: user.id
-        });
+      const { data: isBlocked, error: blockCheckError } = await supabase.rpc('is_user_blocked', {
+        blocker_id: post.user.id,
+        blocked_id: user.id,
+      });
 
       if (blockCheckError) throw blockCheckError;
 
       if (isBlocked) {
-        Alert.alert(
-          "Cannot Message",
-          "This user has blocked you. You cannot send them a message."
-        );
+        Alert.alert('Cannot Message', 'This user has blocked you. You cannot send them a message.');
         return;
       }
 
       // Check if the current user has blocked the seller
-      const { data: hasBlocked, error: hasBlockedError } = await supabase
-        .rpc('is_user_blocked', {
-          blocker_id: user.id,
-          blocked_id: post.user.id
-        });
+      const { data: hasBlocked, error: hasBlockedError } = await supabase.rpc('is_user_blocked', {
+        blocker_id: user.id,
+        blocked_id: post.user.id,
+      });
 
       if (hasBlockedError) throw hasBlockedError;
 
       if (hasBlocked) {
         Alert.alert(
-          "Cannot Message",
-          "You have blocked this user. Please unblock them to send a message."
+          'Cannot Message',
+          'You have blocked this user. Please unblock them to send a message.'
         );
         return;
       }
 
       // Navigate to chat room
       router.push({
-        pathname: "/ChatRoom",
+        pathname: '/ChatRoom',
         params: {
           postId: post.id,
           sellerId: post.user.id,
@@ -172,11 +199,11 @@ export default function PostDetails() {
           postImage: post.image_ids && post.image_ids.length > 0 ? post.image_ids[0] : '',
           postPrice: post.price.toString(),
           postCurrency: post.currency,
-        }
+        },
       });
     } catch (error) {
       console.error('Error checking block status:', error);
-      Alert.alert("Error", "Failed to start conversation. Please try again.");
+      Alert.alert('Error', 'Failed to start conversation. Please try again.');
     }
   };
 
@@ -191,11 +218,13 @@ export default function PostDetails() {
 
   const openInMaps = () => {
     if (!post) return;
-    const address = encodeURIComponent(`${post.location.address || ''} ${post.location.city || ''}`.trim());
+    const address = encodeURIComponent(
+      `${post.location.address || ''} ${post.location.city || ''}`.trim()
+    );
     const url = Platform.select({
       ios: `maps:0,0?q=${address}`,
       android: `geo:0,0?q=${address}`,
-      default: `https://www.google.com/maps/search/?api=1&query=${address}`
+      default: `https://www.google.com/maps/search/?api=1&query=${address}`,
     });
     if (url) Linking.openURL(url);
   };
@@ -214,11 +243,7 @@ export default function PostDetails() {
       <View style={[styles.container, { backgroundColor: theme.colors.background }]}>
         <Header title="Details" />
         <View style={styles.errorContainer}>
-          <MaterialCommunityIcons 
-            name="alert-circle" 
-            size={48} 
-            color={theme.colors.error} 
-          />
+          <MaterialCommunityIcons name="alert-circle" size={48} color={theme.colors.error} />
           <Text variant="titleMedium" style={styles.errorText}>
             Post not found
           </Text>
@@ -238,16 +263,20 @@ export default function PostDetails() {
     { label: 'Year', value: post.details?.year || '' },
   ];
 
-  const dynamicDetailItems: Array<{ label: string; value: string }> = Object.entries(post.details || {})
+  const dynamicDetailItems: Array<{ label: string; value: string }> = Object.entries(
+    post.details || {}
+  )
     .filter(([key]) => !['make', 'model', 'year'].includes(key))
     .map(([key, value]) => ({
       icon: 'check' as IconName,
       label: formatDetailLabel(key),
       value: formatDetailValue(value),
     }))
-    .filter(item => item.value);
+    .filter((item) => item.value);
 
-  const combinedDetailItems = [...baseDetailItems, ...dynamicDetailItems].filter(item => item.value);
+  const combinedDetailItems = [...baseDetailItems, ...dynamicDetailItems].filter(
+    (item) => item.value
+  );
   const detailRows = [];
   for (let i = 0; i < combinedDetailItems.length; i += 2) {
     detailRows.push(combinedDetailItems.slice(i, i + 2));
@@ -257,13 +286,21 @@ export default function PostDetails() {
     <>
       <View style={[styles.container, { backgroundColor: theme.colors.background }]}>
         <Header title="Details" />
-        <ScrollView contentContainerStyle={{ paddingBottom: 120 }} showsVerticalScrollIndicator={false}>
+        <ScrollView
+          contentContainerStyle={{ paddingBottom: 120 }}
+          showsVerticalScrollIndicator={false}>
           {/* Image Carousel */}
           <View style={[styles.carouselContainer, { backgroundColor: theme.colors.surface }]}>
-            {(!filteredImages || filteredImages.length === 0) ? (
+            {!filteredImages || filteredImages.length === 0 ? (
               <View style={[styles.errorOverlay, { backgroundColor: theme.colors.surfaceVariant }]}>
-                <MaterialCommunityIcons name="image-off" size={48} color={theme.colors.onSurfaceVariant} />
-                <Text style={[styles.imageErrorText, { color: theme.colors.onSurfaceVariant }]}>No images available</Text>
+                <MaterialCommunityIcons
+                  name="image-off"
+                  size={48}
+                  color={theme.colors.onSurfaceVariant}
+                />
+                <Text style={[styles.imageErrorText, { color: theme.colors.onSurfaceVariant }]}>
+                  No images available
+                </Text>
               </View>
             ) : (
               <>
@@ -280,7 +317,11 @@ export default function PostDetails() {
                 />
                 {/* Image count indicator */}
                 {filteredImages.length > 1 && (
-                  <View style={[styles.imageCountContainer, { backgroundColor: theme.colors.surfaceVariant + 'CC' }]}>
+                  <View
+                    style={[
+                      styles.imageCountContainer,
+                      { backgroundColor: theme.colors.surfaceVariant + 'CC' },
+                    ]}>
                     <Text style={[styles.imageCountText, { color: theme.colors.onSurfaceVariant }]}>
                       {carouselIndex + 1}/{filteredImages.length}
                     </Text>
@@ -293,11 +334,15 @@ export default function PostDetails() {
           <View style={styles.content}>
             {/* Title and Save Button */}
             <View style={styles.titleRow}>
-              <Text variant="titleLarge" style={[styles.title, { color: theme.colors.onSurface, fontSize: 20 }]} numberOfLines={2} ellipsizeMode="tail">
+              <Text
+                variant="titleLarge"
+                style={[styles.title, { color: theme.colors.onSurface, fontSize: 20 }]}
+                numberOfLines={2}
+                ellipsizeMode="tail">
                 {post.title}
               </Text>
               <IconButton
-                icon={isSaved ? "bookmark" : "bookmark-outline"}
+                icon={isSaved ? 'bookmark' : 'bookmark-outline'}
                 size={24}
                 iconColor={isSaved ? theme.colors.error : theme.colors.primary}
                 onPress={handleSavePost}
@@ -310,46 +355,51 @@ export default function PostDetails() {
               <Text style={[styles.priceText, { color: theme.colors.onSurface, fontSize: 18 }]}>
                 {formatPrice(post.price, post.currency)}
               </Text>
-              <Chip 
+              <Chip
                 mode="flat"
                 style={[styles.listingTypeChip, { backgroundColor: theme.colors.primaryContainer }]}
-                textStyle={{ color: theme.colors.primary, fontWeight: 'bold' }}
-              >
+                textStyle={{ color: theme.colors.primary, fontWeight: 'bold' }}>
                 {post.listing_type === 'rent' ? 'Rent' : 'Sale'}
               </Chip>
             </View>
             {/* Location and Date */}
             <View style={styles.metadataRow}>
               <TouchableOpacity style={styles.metadataItem} onPress={openInMaps}>
-                <MaterialCommunityIcons 
-                  name="map-marker" 
-                  size={20} 
-                  color={theme.colors.onSurfaceVariant} 
+                <MaterialCommunityIcons
+                  name="map-marker"
+                  size={20}
+                  color={theme.colors.onSurfaceVariant}
                 />
-                <Text variant="bodyMedium" style={[styles.metadataText, { color: theme.colors.onSurface, fontSize: 13 }]} numberOfLines={1}>
+                <Text
+                  variant="bodyMedium"
+                  style={[styles.metadataText, { color: theme.colors.onSurface, fontSize: 13 }]}
+                  numberOfLines={1}>
                   {post.location.city}
                   {post.location.address && `, ${post.location.address}`}
                 </Text>
               </TouchableOpacity>
             </View>
-            <Text variant="bodySmall" style={[styles.date, { color: theme.colors.onSurfaceVariant, fontSize: 12 }]}>
+            <Text
+              variant="bodySmall"
+              style={[styles.date, { color: theme.colors.onSurfaceVariant, fontSize: 12 }]}>
               Posted on {formatDate(post.created_at)}
             </Text>
             {combinedDetailItems.length > 0 && (
               <>
                 <Divider style={[styles.divider, { backgroundColor: theme.colors.outline }]} />
-                <Text variant="titleMedium" style={[styles.sectionTitle, { color: theme.colors.onSurface, fontSize: 16 }]}>
+                <Text
+                  variant="titleMedium"
+                  style={[styles.sectionTitle, { color: theme.colors.onSurface, fontSize: 16 }]}>
                   Item Details
                 </Text>
                 <View style={styles.detailsGrid}>
                   {detailRows.map((row, rowIndex) => (
                     <View key={`detail-row-${rowIndex}`} style={styles.detailsRow}>
                       {row.map((detail) => (
-                        <View key={`${detail.label}-${detail.value}`} style={styles.detailItemContainer}>
-                          <DetailItem
-                            label={detail.label}
-                            value={detail.value}
-                          />
+                        <View
+                          key={`${detail.label}-${detail.value}`}
+                          style={styles.detailItemContainer}>
+                          <DetailItem label={detail.label} value={detail.value} />
                         </View>
                       ))}
                       {row.length === 1 && <View style={styles.detailItemContainer} />}
@@ -360,31 +410,37 @@ export default function PostDetails() {
             )}
             <Divider style={[styles.divider, { backgroundColor: theme.colors.outline }]} />
             {/* Description */}
-            <Text variant="titleMedium" style={[styles.sectionTitle, { color: theme.colors.onSurface, fontSize: 16 }]}>
+            <Text
+              variant="titleMedium"
+              style={[styles.sectionTitle, { color: theme.colors.onSurface, fontSize: 16 }]}>
               Description
             </Text>
-            <Text variant="bodyMedium" style={[styles.description, { color: theme.colors.onSurface }]}>
+            <Text
+              variant="bodyMedium"
+              style={[styles.description, { color: theme.colors.onSurface }]}>
               {post.description}
             </Text>
             <Divider style={[styles.divider, { backgroundColor: theme.colors.outline }]} />
             {/* Contact Section */}
             <View style={styles.contactSection}>
-              <Text variant="titleMedium" style={[styles.sectionTitle, { color: theme.colors.onSurface, fontSize: 16 }]}>
+              <Text
+                variant="titleMedium"
+                style={[styles.sectionTitle, { color: theme.colors.onSurface, fontSize: 16 }]}>
                 Contact Seller
               </Text>
               <View style={styles.sellerInfo}>
                 <View style={{ marginRight: 12 }}>
-                  <ProfileImage 
-                    imageId={post.user?.profile_image_id}
-                    size={48}
-                    folder="avatars"
-                  />
+                  <ProfileImage imageId={post.user?.profile_image_id} size={48} folder="avatars" />
                 </View>
                 <View style={styles.sellerDetails}>
-                  <Text variant="titleMedium" style={[styles.sellerName, { color: theme.colors.onSurface }]}>
+                  <Text
+                    variant="titleMedium"
+                    style={[styles.sellerName, { color: theme.colors.onSurface }]}>
                     {post.user?.display_name || 'Unknown Seller'}
                   </Text>
-                  <Text variant="bodySmall" style={[styles.sellerLocation, { color: theme.colors.onSurfaceVariant }]}>
+                  <Text
+                    variant="bodySmall"
+                    style={[styles.sellerLocation, { color: theme.colors.onSurfaceVariant }]}>
                     {post.location.city}
                   </Text>
                 </View>
@@ -395,8 +451,7 @@ export default function PostDetails() {
                   icon="message"
                   onPress={handleMessageSeller}
                   style={styles.messageButton}
-                  contentStyle={styles.buttonContent}
-                >
+                  contentStyle={styles.buttonContent}>
                   Message Seller
                 </Button>
                 <Button
@@ -404,8 +459,7 @@ export default function PostDetails() {
                   icon="flag"
                   onPress={handleReportPost}
                   style={[styles.reportButton, { borderColor: theme.colors.error }]}
-                  contentStyle={styles.buttonContent}
-                >
+                  contentStyle={styles.buttonContent}>
                   Report Post
                 </Button>
               </View>
@@ -438,9 +492,7 @@ export default function PostDetails() {
 
 const formatDetailLabel = (label: string) => {
   if (!label) return '';
-  return label
-    .replace(/_/g, ' ')
-    .replace(/\b\w/g, (char) => char.toUpperCase());
+  return label.replace(/_/g, ' ').replace(/\b\w/g, (char) => char.toUpperCase());
 };
 
 const formatDetailValue = (value: unknown): string => {

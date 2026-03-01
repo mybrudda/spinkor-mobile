@@ -1,13 +1,6 @@
 import React, { useState } from 'react';
 import { View, StyleSheet, ScrollView, Alert } from 'react-native';
-import { 
-  Modal, 
-  Portal, 
-  Text, 
-  Button, 
-  TextInput, 
-  useTheme
-} from 'react-native-paper';
+import { Modal, Portal, Text, Button, TextInput, useTheme } from 'react-native-paper';
 import DropdownComponent from './ui/Dropdown';
 import { useAuthStore } from '../store/useAuthStore';
 
@@ -44,7 +37,6 @@ export default function ReportPostModal({
   postId,
   reporterId,
   postOwnerId,
-
 }: ReportPostModalProps) {
   const theme = useTheme();
   const { session } = useAuthStore();
@@ -93,7 +85,7 @@ export default function ReportPostModal({
     }
 
     setIsSubmitting(true);
-    
+
     try {
       // Check if user is authenticated using Zustand store
       if (!session) {
@@ -115,28 +107,22 @@ export default function ReportPostModal({
       }
 
       // Make API call to Supabase function
-      const response = await fetch(
-        `${supabaseUrl}/functions/v1/create-post-report`,
-        {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${session.access_token}`,
-          },
-          body: JSON.stringify(reportData),
-        }
-      );
+      const response = await fetch(`${supabaseUrl}/functions/v1/create-post-report`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${session.access_token}`,
+        },
+        body: JSON.stringify(reportData),
+      });
 
       if (!response.ok) {
         const errorData = await response.json().catch(() => ({}));
-        throw new Error(
-          errorData.error || `Failed to submit report (${response.status})`
-        );
+        throw new Error(errorData.error || `Failed to submit report (${response.status})`);
       }
 
       const result = await response.json();
-      
-  
+
       console.log('Report submitted successfully:', {
         reportId: result.id,
         postId,
@@ -144,19 +130,17 @@ export default function ReportPostModal({
         postOwnerId,
         reason,
         details: details.trim() || null,
-        timestamp: new Date().toISOString()
+        timestamp: new Date().toISOString(),
       });
 
       setIsSuccess(true);
-      
+
       // Auto-dismiss after showing success
       setTimeout(() => {
         handleDismiss();
       }, 2000);
-      
     } catch (error) {
       console.error('Error submitting report:', error);
-      
 
       Alert.alert(
         'Report Submission Failed',
@@ -187,15 +171,19 @@ export default function ReportPostModal({
               onDismiss={handleDismiss}
               contentContainerStyle={[
                 styles.modalContainer,
-                { backgroundColor: theme.colors.surface }
-              ]}
-            >
+                { backgroundColor: theme.colors.surface },
+              ]}>
               <View style={styles.successContainer}>
-                <Text variant="headlineSmall" style={[styles.successTitle, { color: theme.colors.primary }]}>
+                <Text
+                  variant="headlineSmall"
+                  style={[styles.successTitle, { color: theme.colors.primary }]}>
                   Report Submitted
                 </Text>
-                <Text variant="bodyMedium" style={[styles.successMessage, { color: theme.colors.onSurface }]}>
-                  Thank you for your report. We will review it and take appropriate action if necessary.
+                <Text
+                  variant="bodyMedium"
+                  style={[styles.successMessage, { color: theme.colors.onSurface }]}>
+                  Thank you for your report. We will review it and take appropriate action if
+                  necessary.
                 </Text>
               </View>
             </Modal>
@@ -214,18 +202,20 @@ export default function ReportPostModal({
             onDismiss={handleDismiss}
             contentContainerStyle={[
               styles.modalContainer,
-              { backgroundColor: theme.colors.surface }
-            ]}
-          >
+              { backgroundColor: theme.colors.surface },
+            ]}>
             <View style={[styles.header, { borderBottomColor: theme.colors.outline }]}>
-              <Text variant="headlineSmall" style={[styles.title, { color: theme.colors.onSurface }]}>
+              <Text
+                variant="headlineSmall"
+                style={[styles.title, { color: theme.colors.onSurface }]}>
                 Report
               </Text>
             </View>
 
             <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
-             
-              <Text variant="titleMedium" style={[styles.sectionTitle, { color: theme.colors.onSurface }]}>
+              <Text
+                variant="titleMedium"
+                style={[styles.sectionTitle, { color: theme.colors.onSurface }]}>
                 Reason
               </Text>
 
@@ -238,15 +228,19 @@ export default function ReportPostModal({
               />
 
               {selectedReasonDescription && (
-                <Text variant="bodySmall" style={[styles.reasonDescription, { color: theme.colors.onSurfaceVariant }]}>
+                <Text
+                  variant="bodySmall"
+                  style={[styles.reasonDescription, { color: theme.colors.onSurfaceVariant }]}>
                   {selectedReasonDescription}
                 </Text>
               )}
 
-              <Text variant="titleMedium" style={[styles.sectionTitle, { color: theme.colors.onSurface }]}>
+              <Text
+                variant="titleMedium"
+                style={[styles.sectionTitle, { color: theme.colors.onSurface }]}>
                 Details (Optional)
               </Text>
-              
+
               <TextInput
                 mode="outlined"
                 multiline
@@ -261,9 +255,7 @@ export default function ReportPostModal({
                 error={!!detailsError}
                 right={
                   details.length > 0 ? (
-                    <TextInput.Affix 
-                      text={`${details.length}/${MAX_DETAILS_LENGTH}`} 
-                    />
+                    <TextInput.Affix text={`${details.length}/${MAX_DETAILS_LENGTH}`} />
                   ) : undefined
                 }
               />
@@ -272,16 +264,20 @@ export default function ReportPostModal({
                   {detailsError}
                 </Text>
               ) : details.length > 0 ? (
-                <Text variant="bodySmall" style={[styles.helpText, { color: theme.colors.onSurfaceVariant }]}>
-                  {details.length >= MIN_DETAILS_LENGTH ? null : `At least ${MIN_DETAILS_LENGTH} characters needed`}
+                <Text
+                  variant="bodySmall"
+                  style={[styles.helpText, { color: theme.colors.onSurfaceVariant }]}>
+                  {details.length >= MIN_DETAILS_LENGTH
+                    ? null
+                    : `At least ${MIN_DETAILS_LENGTH} characters needed`}
                 </Text>
               ) : (
-                <Text variant="bodySmall" style={[styles.helpText, { color: theme.colors.onSurfaceVariant }]}>
+                <Text
+                  variant="bodySmall"
+                  style={[styles.helpText, { color: theme.colors.onSurfaceVariant }]}>
                   (Optional) Provide more details if needed.
                 </Text>
               )}
-
-             
             </ScrollView>
 
             <View style={[styles.footer, { borderTopColor: theme.colors.outline }]}>
@@ -289,8 +285,7 @@ export default function ReportPostModal({
                 mode="outlined"
                 onPress={handleDismiss}
                 style={styles.footerButton}
-                disabled={isSubmitting}
-              >
+                disabled={isSubmitting}>
                 Cancel
               </Button>
               <Button
@@ -298,8 +293,7 @@ export default function ReportPostModal({
                 onPress={handleSubmit}
                 loading={isSubmitting}
                 disabled={isSubmitting}
-                style={styles.footerButton}
-              >
+                style={styles.footerButton}>
                 Submit Report
               </Button>
             </View>
@@ -391,4 +385,4 @@ const styles = StyleSheet.create({
   errorText: {
     marginTop: 8,
   },
-}); 
+});

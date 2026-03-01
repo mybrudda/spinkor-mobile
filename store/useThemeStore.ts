@@ -20,4 +20,4 @@ export const useThemeStore = create<ThemeState>()(
       storage: createJSONStorage(() => AsyncStorage),
     }
   )
-); 
+);

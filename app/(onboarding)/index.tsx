@@ -17,22 +17,26 @@ interface OnboardingStep {
 const ONBOARDING_STEPS: OnboardingStep[] = [
   {
     title: 'Welcome to Spinkor',
-    description: 'Your marketplace for buying and selling items in your community. Find great deals or list your items for sale.',
+    description:
+      'Your marketplace for buying and selling items in your community. Find great deals or list your items for sale.',
     icon: 'store',
   },
   {
     title: 'Browse Categories',
-    description: 'Explore thousands of items across various categories including vehicles, electronics, home & furniture, and more.',
+    description:
+      'Explore thousands of items across various categories including vehicles, electronics, home & furniture, and more.',
     icon: 'view-grid',
   },
   {
     title: 'Connect with Sellers',
-    description: 'Message sellers directly through our built-in chat system. Negotiate prices and arrange meetups easily.',
+    description:
+      'Message sellers directly through our built-in chat system. Negotiate prices and arrange meetups easily.',
     icon: 'message-text',
   },
   {
     title: 'Safe & Secure',
-    description: 'All posts are moderated to ensure a safe marketplace experience. Report any inappropriate content.',
+    description:
+      'All posts are moderated to ensure a safe marketplace experience. Report any inappropriate content.',
     icon: 'shield-check',
   },
 ];
@@ -97,10 +101,9 @@ export default function OnboardingScreen() {
   if (isCountryStep) {
     return (
       <View style={[styles.container, { backgroundColor: theme.colors.background }]}>
-        <ScrollView 
+        <ScrollView
           contentContainerStyle={styles.scrollContent}
-          showsVerticalScrollIndicator={false}
-        >
+          showsVerticalScrollIndicator={false}>
           <View style={styles.content}>
             <MaterialCommunityIcons
               name="earth"
@@ -108,79 +111,103 @@ export default function OnboardingScreen() {
               color={theme.colors.primary}
               style={styles.countryIcon}
             />
-            <Text variant="headlineMedium" style={[styles.title, { color: theme.colors.onSurface }]}>
+            <Text
+              variant="headlineMedium"
+              style={[styles.title, { color: theme.colors.onSurface }]}>
               Select Your Country
             </Text>
-            <Text variant="bodyLarge" style={[styles.description, { color: theme.colors.onSurfaceVariant }]}>
+            <Text
+              variant="bodyLarge"
+              style={[styles.description, { color: theme.colors.onSurfaceVariant }]}>
               Choose your country to see relevant listings in your area
             </Text>
 
             <View style={styles.countryContainer}>
               <TouchableOpacity
                 onPress={() => handleCountrySelect('afghanistan')}
-                activeOpacity={0.7}
-              >
+                activeOpacity={0.7}>
                 <Card
                   mode="elevated"
                   style={[
                     styles.countryCard,
                     {
-                      backgroundColor: selectedCountry === 'afghanistan'
-                        ? theme.colors.primaryContainer
-                        : theme.colors.surfaceVariant,
-                      borderColor: selectedCountry === 'afghanistan'
-                        ? theme.colors.primary
-                        : theme.colors.outline,
+                      backgroundColor:
+                        selectedCountry === 'afghanistan'
+                          ? theme.colors.primaryContainer
+                          : theme.colors.surfaceVariant,
+                      borderColor:
+                        selectedCountry === 'afghanistan'
+                          ? theme.colors.primary
+                          : theme.colors.outline,
                       borderWidth: selectedCountry === 'afghanistan' ? 2 : 1,
                     },
-                  ]}
-                >
+                  ]}>
                   <Card.Content style={styles.countryCardContent}>
-                    <Text variant="headlineSmall" style={[
-                      styles.countryName,
-                      { color: selectedCountry === 'afghanistan' ? theme.colors.onPrimaryContainer : theme.colors.onSurfaceVariant }
-                    ]}>
+                    <Text
+                      variant="headlineSmall"
+                      style={[
+                        styles.countryName,
+                        {
+                          color:
+                            selectedCountry === 'afghanistan'
+                              ? theme.colors.onPrimaryContainer
+                              : theme.colors.onSurfaceVariant,
+                        },
+                      ]}>
                       Afghanistan
                     </Text>
                     <MaterialCommunityIcons
                       name="flag"
                       size={32}
-                      color={selectedCountry === 'afghanistan' ? theme.colors.primary : theme.colors.onSurfaceVariant}
+                      color={
+                        selectedCountry === 'afghanistan'
+                          ? theme.colors.primary
+                          : theme.colors.onSurfaceVariant
+                      }
                     />
                   </Card.Content>
                 </Card>
               </TouchableOpacity>
 
-              <TouchableOpacity
-                onPress={() => handleCountrySelect('pakistan')}
-                activeOpacity={0.7}
-              >
+              <TouchableOpacity onPress={() => handleCountrySelect('pakistan')} activeOpacity={0.7}>
                 <Card
                   mode="elevated"
                   style={[
                     styles.countryCard,
                     {
-                      backgroundColor: selectedCountry === 'pakistan'
-                        ? theme.colors.primaryContainer
-                        : theme.colors.surfaceVariant,
-                      borderColor: selectedCountry === 'pakistan'
-                        ? theme.colors.primary
-                        : theme.colors.outline,
+                      backgroundColor:
+                        selectedCountry === 'pakistan'
+                          ? theme.colors.primaryContainer
+                          : theme.colors.surfaceVariant,
+                      borderColor:
+                        selectedCountry === 'pakistan'
+                          ? theme.colors.primary
+                          : theme.colors.outline,
                       borderWidth: selectedCountry === 'pakistan' ? 2 : 1,
                     },
-                  ]}
-                >
+                  ]}>
                   <Card.Content style={styles.countryCardContent}>
-                    <Text variant="headlineSmall" style={[
-                      styles.countryName,
-                      { color: selectedCountry === 'pakistan' ? theme.colors.onPrimaryContainer : theme.colors.onSurfaceVariant }
-                    ]}>
+                    <Text
+                      variant="headlineSmall"
+                      style={[
+                        styles.countryName,
+                        {
+                          color:
+                            selectedCountry === 'pakistan'
+                              ? theme.colors.onPrimaryContainer
+                              : theme.colors.onSurfaceVariant,
+                        },
+                      ]}>
                       Pakistan
                     </Text>
                     <MaterialCommunityIcons
                       name="flag"
                       size={32}
-                      color={selectedCountry === 'pakistan' ? theme.colors.primary : theme.colors.onSurfaceVariant}
+                      color={
+                        selectedCountry === 'pakistan'
+                          ? theme.colors.primary
+                          : theme.colors.onSurfaceVariant
+                      }
                     />
                   </Card.Content>
                 </Card>
@@ -189,23 +216,23 @@ export default function OnboardingScreen() {
 
             {selectedCountry && (
               <View style={styles.authButtons}>
-                <Text variant="bodyLarge" style={[styles.authPrompt, { color: theme.colors.onSurface }]}>
+                <Text
+                  variant="bodyLarge"
+                  style={[styles.authPrompt, { color: theme.colors.onSurface }]}>
                   Get Started
                 </Text>
                 <Button
                   mode="contained"
                   onPress={handleRegister}
                   style={styles.authButton}
-                  contentStyle={styles.authButtonContent}
-                >
+                  contentStyle={styles.authButtonContent}>
                   Create Account
                 </Button>
                 <Button
                   mode="outlined"
                   onPress={handleLogin}
                   style={styles.authButton}
-                  contentStyle={styles.authButtonContent}
-                >
+                  contentStyle={styles.authButtonContent}>
                   Login
                 </Button>
               </View>
@@ -221,10 +248,7 @@ export default function OnboardingScreen() {
 
   return (
     <View style={[styles.container, { backgroundColor: theme.colors.background }]}>
-      <ScrollView 
-        contentContainerStyle={styles.scrollContent}
-        showsVerticalScrollIndicator={false}
-      >
+      <ScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
         <View style={styles.content}>
           <View style={styles.iconContainer}>
             <MaterialCommunityIcons
@@ -241,9 +265,8 @@ export default function OnboardingScreen() {
                 style={[
                   styles.paginationDot,
                   {
-                    backgroundColor: index === currentStep
-                      ? theme.colors.primary
-                      : theme.colors.outlineVariant,
+                    backgroundColor:
+                      index === currentStep ? theme.colors.primary : theme.colors.outlineVariant,
                     width: index === currentStep ? 24 : 8,
                   },
                 ]}
@@ -255,17 +278,15 @@ export default function OnboardingScreen() {
             {step.title}
           </Text>
 
-          <Text variant="bodyLarge" style={[styles.description, { color: theme.colors.onSurfaceVariant }]}>
+          <Text
+            variant="bodyLarge"
+            style={[styles.description, { color: theme.colors.onSurfaceVariant }]}>
             {step.description}
           </Text>
 
           <View style={styles.buttonContainer}>
             {!isLastStep && (
-              <Button
-                mode="text"
-                onPress={handleSkip}
-                style={styles.skipButton}
-              >
+              <Button mode="text" onPress={handleSkip} style={styles.skipButton}>
                 Skip
               </Button>
             )}
@@ -273,8 +294,7 @@ export default function OnboardingScreen() {
               mode="contained"
               onPress={handleNext}
               style={styles.nextButton}
-              contentStyle={styles.nextButtonContent}
-            >
+              contentStyle={styles.nextButtonContent}>
               {isLastStep ? 'Continue' : 'Next'}
             </Button>
           </View>
@@ -378,4 +398,3 @@ const styles = StyleSheet.create({
     paddingVertical: 8,
   },
 });
-

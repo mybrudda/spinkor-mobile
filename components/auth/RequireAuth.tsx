@@ -8,7 +8,10 @@ interface RequireAuthProps {
   message?: string;
 }
 
-export default function RequireAuth({ children, message = "You need to be logged in to access this feature." }: RequireAuthProps) {
+export default function RequireAuth({
+  children,
+  message = 'You need to be logged in to access this feature.',
+}: RequireAuthProps) {
   const { user } = useAuthStore();
   const theme = useTheme();
 
@@ -21,10 +24,7 @@ export default function RequireAuth({ children, message = "You need to be logged
         <Text variant="bodyLarge" style={{ textAlign: 'center', marginBottom: 24 }}>
           {message}
         </Text>
-        <Button
-          mode="contained"
-          onPress={() => router.push('/(auth)/login')}
-        >
+        <Button mode="contained" onPress={() => router.push('/(auth)/login')}>
           Go to Login
         </Button>
       </View>
@@ -40,4 +40,4 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     padding: 16,
   },
-}); 
+});

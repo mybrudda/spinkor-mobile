@@ -23,7 +23,8 @@ const ERROR_MESSAGES = {
   VALIDATION_FAILED: 'Please fill in all required fields',
   IMAGE_LIMIT_REACHED: (limit: number) => `You can only select up to ${limit} images.`,
   IMAGE_PICK_FAILED: 'Failed to pick image. Please try again.',
-  POST_CREATION_FAILED: 'Failed to create post. Please check your network connection and try again.',
+  POST_CREATION_FAILED:
+    'Failed to create post. Please check your network connection and try again.',
   SUPABASE_CONNECTION_FAILED: (error: string) => `Database connection failed: ${error}`,
 } as const;
 
@@ -54,7 +55,7 @@ export function usePostForm<T extends BaseFormData>({
   postType,
   transformForm,
   validateForm,
-  successMessage
+  successMessage,
 }: UsePostFormProps<T>) {
   const { user } = useAuthStore();
   const [loading, setLoading] = useState(false);
@@ -66,7 +67,10 @@ export function usePostForm<T extends BaseFormData>({
     source: 'gallery' | 'camera' = 'gallery'
   ) => {
     if (images.length >= VALIDATION_LIMITS.IMAGES_PER_POST) {
-      Alert.alert('Limit Reached', ERROR_MESSAGES.IMAGE_LIMIT_REACHED(VALIDATION_LIMITS.IMAGES_PER_POST));
+      Alert.alert(
+        'Limit Reached',
+        ERROR_MESSAGES.IMAGE_LIMIT_REACHED(VALIDATION_LIMITS.IMAGES_PER_POST)
+      );
       return;
     }
 
@@ -82,36 +86,40 @@ export function usePostForm<T extends BaseFormData>({
         // Request permissions for media library if needed
         const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
         if (status !== 'granted') {
-          Alert.alert('Permission Required', 'Media library permission is required to select images.');
+          Alert.alert(
+            'Permission Required',
+            'Media library permission is required to select images.'
+          );
           return;
         }
       }
 
-      const result = source === 'camera'
-        ? await ImagePicker.launchCameraAsync({
-            mediaTypes: "images",
-            allowsEditing: true,
-            aspect: [...DEFAULT_FORM_VALUES.IMAGE_ASPECT],
-            quality: DEFAULT_FORM_VALUES.IMAGE_QUALITY,
-            base64: true,
-          })
-        : await ImagePicker.launchImageLibraryAsync({
-            mediaTypes: "images",
-            allowsEditing: true,
-            aspect: [...DEFAULT_FORM_VALUES.IMAGE_ASPECT],
-            quality: DEFAULT_FORM_VALUES.IMAGE_QUALITY,
-            base64: true,
-          });
+      const result =
+        source === 'camera'
+          ? await ImagePicker.launchCameraAsync({
+              mediaTypes: 'images',
+              allowsEditing: true,
+              aspect: [...DEFAULT_FORM_VALUES.IMAGE_ASPECT],
+              quality: DEFAULT_FORM_VALUES.IMAGE_QUALITY,
+              base64: true,
+            })
+          : await ImagePicker.launchImageLibraryAsync({
+              mediaTypes: 'images',
+              allowsEditing: true,
+              aspect: [...DEFAULT_FORM_VALUES.IMAGE_ASPECT],
+              quality: DEFAULT_FORM_VALUES.IMAGE_QUALITY,
+              base64: true,
+            });
 
       if (!result.canceled && result.assets?.[0] && result.assets[0].base64) {
         // Resize the image to 800x600 before adding it to the form
         const resizedBase64 = await resizeImage(result.assets[0].base64 as string);
         const newImages = [...images, resizedBase64];
         setImages(newImages);
-        
+
         // Clear image error if images are now valid
         if (newImages.length >= VALIDATION_LIMITS.MIN_IMAGES && errors.images) {
-          setErrors(prev => {
+          setErrors((prev) => {
             const newErrors = { ...prev };
             delete newErrors.images;
             return newErrors;
@@ -131,18 +139,18 @@ export function usePostForm<T extends BaseFormData>({
   ) => {
     const newImages = images.filter((_, i) => i !== index);
     setImages(newImages);
-    
+
     // Clear image error if images are still valid, or add error if now invalid
     if (newImages.length >= VALIDATION_LIMITS.MIN_IMAGES && errors.images) {
-      setErrors(prev => {
+      setErrors((prev) => {
         const newErrors = { ...prev };
         delete newErrors.images;
         return newErrors;
       });
     } else if (newImages.length < VALIDATION_LIMITS.MIN_IMAGES && !errors.images) {
-      setErrors(prev => ({
+      setErrors((prev) => ({
         ...prev,
-        images: 'At least one image is required'
+        images: 'At least one image is required',
       }));
     }
   };
@@ -156,7 +164,7 @@ export function usePostForm<T extends BaseFormData>({
     setFormState({ ...formState, [field]: value });
     const fieldKey = String(field);
     if (errors[fieldKey]) {
-      setErrors(prev => {
+      setErrors((prev) => {
         const newErrors = { ...prev };
         delete newErrors[fieldKey];
         return newErrors;
@@ -172,11 +180,11 @@ export function usePostForm<T extends BaseFormData>({
   ) => {
     setFormState({
       ...formState,
-      location: { ...formState.location, [field]: value }
+      location: { ...formState.location, [field]: value },
     });
     const locationFieldKey = `location.${String(field)}`;
     if (errors[locationFieldKey]) {
-      setErrors(prev => {
+      setErrors((prev) => {
         const newErrors = { ...prev };
         delete newErrors[locationFieldKey];
         return newErrors;
@@ -211,7 +219,7 @@ export function usePostForm<T extends BaseFormData>({
       }
 
       const uploadedUrls = await Promise.all(
-        formState.images.map((base64Image: string) => 
+        formState.images.map((base64Image: string) =>
           uploadToCloudinary(`data:image/jpeg;base64,${base64Image}`)
         )
       );
@@ -234,28 +242,26 @@ export function usePostForm<T extends BaseFormData>({
         status: 'pending',
         created_at: new Date().toISOString(),
         updated_at: new Date().toISOString(),
-        expires_at: new Date(Date.now() + DEFAULT_FORM_VALUES.POST_EXPIRY_DAYS * 24 * 60 * 60 * 1000).toISOString()
+        expires_at: new Date(
+          Date.now() + DEFAULT_FORM_VALUES.POST_EXPIRY_DAYS * 24 * 60 * 60 * 1000
+        ).toISOString(),
       };
 
       console.log('Attempting to create post with data:', JSON.stringify(postData, null, 2));
 
-      const { data, error } = await supabase
-        .from('posts')
-        .insert([postData])
-        .select()
-        .single();
+      const { data, error } = await supabase.from('posts').insert([postData]).select().single();
 
       if (error) {
         console.error('Supabase error:', error);
         throw error;
       }
-      
+
       Alert.alert('Success', successMessage);
       router.back();
     } catch (error) {
       console.error('Error creating post:', error);
       Alert.alert(
-        'Error', 
+        'Error',
         `${ERROR_MESSAGES.POST_CREATION_FAILED} ${error instanceof Error ? error.message : ''}`
       );
     } finally {
@@ -270,6 +276,6 @@ export function usePostForm<T extends BaseFormData>({
     handleRemoveImage,
     handleInputChange,
     handleLocationChange,
-    handleSubmit
+    handleSubmit,
   };
-} 
+}

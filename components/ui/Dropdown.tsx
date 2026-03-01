@@ -30,7 +30,7 @@ const DropdownComponent: React.FC<DropdownComponentProps> = ({
   disabled = false,
   loading = false,
   searchable = true,
-  searchPlaceholder = "Search...",
+  searchPlaceholder = 'Search...',
 }) => {
   const { colors } = useTheme();
   const [isFocused, setIsFocused] = useState(false);
@@ -46,11 +46,8 @@ const DropdownComponent: React.FC<DropdownComponentProps> = ({
             borderBottomColor: colors.outlineVariant || '#ccc',
             backgroundColor: isSelected ? colors.secondaryContainer : colors.surfaceVariant,
           },
-        ]}
-      >
-        <Text style={[styles.textItem, { color: colors.onSurface }]}>
-          {item.label}
-        </Text>
+        ]}>
+        <Text style={[styles.textItem, { color: colors.onSurface }]}>{item.label}</Text>
         {isSelected && (
           <AntDesign style={styles.icon} color={colors.primary} name="check-circle" size={20} />
         )}
@@ -70,13 +67,12 @@ const DropdownComponent: React.FC<DropdownComponentProps> = ({
             justifyContent: 'center',
             alignItems: 'center',
           },
-        ]}
-      >
+        ]}>
         <ActivityIndicator size="small" color={colors.primary} />
       </View>
     );
   }
-  
+
   return (
     <View style={{ marginBottom: error ? 4 : 15 }}>
       <Dropdown
@@ -84,24 +80,17 @@ const DropdownComponent: React.FC<DropdownComponentProps> = ({
           styles.dropdown,
           {
             backgroundColor: colors.surfaceVariant,
-            borderColor: error 
-              ? colors.error 
-              : isFocused 
-                ? colors.primary 
-                : colors.outline,
+            borderColor: error ? colors.error : isFocused ? colors.primary : colors.outline,
             borderBottomWidth: isFocused ? 2 : 1,
             opacity: disabled ? 0.6 : 1,
           },
         ]}
         containerStyle={{ backgroundColor: colors.surfaceVariant }}
         itemContainerStyle={{ backgroundColor: colors.surfaceVariant }}
-        placeholderStyle={[
-          styles.placeholderStyle, 
-          { color: colors.onSurfaceVariant }
-        ]}
+        placeholderStyle={[styles.placeholderStyle, { color: colors.onSurfaceVariant }]}
         selectedTextStyle={[
-          styles.selectedTextStyle, 
-          { color: error ? colors.error : colors.onSurface }
+          styles.selectedTextStyle,
+          { color: error ? colors.error : colors.onSurface },
         ]}
         inputSearchStyle={[styles.inputSearchStyle, { color: colors.onSurface }]}
         data={data}

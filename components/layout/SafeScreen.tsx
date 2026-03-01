@@ -13,15 +13,14 @@ export default function SafeScreen({ children, style }: SafeScreenProps) {
   const theme = useTheme();
 
   return (
-    <View 
+    <View
       style={[
-        styles.container, 
-        { 
+        styles.container,
+        {
           paddingTop: insets.top,
         },
-        style
-      ]}
-    >
+        style,
+      ]}>
       {children}
     </View>
   );
@@ -30,5 +29,5 @@ export default function SafeScreen({ children, style }: SafeScreenProps) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-  }
-}); 
+  },
+});

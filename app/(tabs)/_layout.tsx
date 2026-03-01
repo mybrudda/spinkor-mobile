@@ -20,8 +20,7 @@ export default function TabLayout() {
           borderTopColor: theme.colors.surfaceVariant,
           ...(Platform.OS === 'android' && { height: 60 }),
         },
-      }}
-    >
+      }}>
       <Tabs.Screen
         name="home"
         options={{

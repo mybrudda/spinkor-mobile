@@ -12,31 +12,18 @@ interface UserInfoModalProps {
   blurhash: string;
 }
 
-export const UserInfoModal = ({
-  visible,
-  onClose,
-  conversation,
-  blurhash
-}: UserInfoModalProps) => {
+export const UserInfoModal = ({ visible, onClose, conversation, blurhash }: UserInfoModalProps) => {
   const theme = useTheme();
 
   return (
-    <Modal
-      visible={visible}
-      transparent={true}
-      animationType="fade"
-      onRequestClose={onClose}
-    >
+    <Modal visible={visible} transparent={true} animationType="fade" onRequestClose={onClose}>
       <View style={styles.modalOverlay}>
         <View style={[styles.modalContent, { backgroundColor: theme.colors.surface }]}>
           <View style={styles.modalHeader}>
             <Text variant="titleLarge" style={{ color: theme.colors.onSurface }}>
               User Information
             </Text>
-            <TouchableOpacity
-              onPress={onClose}
-              style={styles.closeButton}
-            >
+            <TouchableOpacity onPress={onClose} style={styles.closeButton}>
               <MaterialCommunityIcons
                 name="close"
                 size={24}
@@ -44,7 +31,7 @@ export const UserInfoModal = ({
               />
             </TouchableOpacity>
           </View>
-          
+
           <View style={styles.userInfoContent}>
             <View style={styles.avatarContainer}>
               <ProfileImage
@@ -53,7 +40,7 @@ export const UserInfoModal = ({
                 folder="avatars"
               />
             </View>
-            
+
             <View style={styles.userDetails}>
               <View style={styles.nameRow}>
                 <Text variant="titleMedium" style={{ color: theme.colors.onSurface }}>
@@ -125,4 +112,4 @@ const styles = StyleSheet.create({
   verifiedIcon: {
     marginLeft: 5,
   },
-}); 
+});

@@ -23,27 +23,27 @@ export default function CreateScreen() {
   return (
     <>
       <View style={[styles.container, { backgroundColor: theme.colors.background }]}>
-        
-        
         <View style={styles.content}>
-          <Text variant="titleLarge" style={[
-            styles.title,
-            { color: theme.colors.onSecondaryContainer }
-          ]}>
+          <Text
+            variant="titleLarge"
+            style={[styles.title, { color: theme.colors.onSecondaryContainer }]}>
             Create a Post
           </Text>
 
           <Card style={styles.card} onPress={handleCreateCardPress} mode="elevated">
             <Card.Content style={styles.cardContent}>
-              <View style={[styles.iconContainer, { backgroundColor: theme.colors.primaryContainer }]}>
+              <View
+                style={[styles.iconContainer, { backgroundColor: theme.colors.primaryContainer }]}>
                 <MaterialCommunityIcons name="plus-circle" size={28} color={theme.colors.primary} />
               </View>
               <Text variant="titleMedium" style={styles.cardTitle}>
                 Start a New Listing
               </Text>
-              <Text variant="bodySmall" style={[styles.cardDescription, { color: theme.colors.onSurfaceVariant }]}>
+              <Text
+                variant="bodySmall"
+                style={[styles.cardDescription, { color: theme.colors.onSurfaceVariant }]}>
                 Choose a category like{' '}
-                {CATEGORY_OPTIONS.map(option => option.label)
+                {CATEGORY_OPTIONS.map((option) => option.label)
                   .slice(0, 4)
                   .join(', ')}{' '}
                 and more right after this step.
@@ -51,21 +51,21 @@ export default function CreateScreen() {
             </Card.Content>
           </Card>
 
-        <Text variant="bodySmall" style={[styles.hint, { color: theme.colors.onSurfaceVariant }]}>
-          Tap the card to choose what you want to list
-        </Text>
+          <Text variant="bodySmall" style={[styles.hint, { color: theme.colors.onSurfaceVariant }]}>
+            Tap the card to choose what you want to list
+          </Text>
+        </View>
       </View>
-    </View>
-    
-    <Portal>
-      <LoginRequiredModal
-        visible={showLoginModal}
-        onDismiss={() => setShowLoginModal(false)}
-        action="custom"
-        customTitle="Login Required"
-        customMessage="You need to be logged in to create a post."
-      />
-    </Portal>
+
+      <Portal>
+        <LoginRequiredModal
+          visible={showLoginModal}
+          onDismiss={() => setShowLoginModal(false)}
+          action="custom"
+          customTitle="Login Required"
+          customMessage="You need to be logged in to create a post."
+        />
+      </Portal>
     </>
   );
 }
@@ -115,4 +115,4 @@ const styles = StyleSheet.create({
     marginTop: 16,
     opacity: 0.7,
   },
-}); 
+});

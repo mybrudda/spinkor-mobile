@@ -23,7 +23,7 @@ export const useUnreadMessagesStore = create<UnreadMessagesState>((set, get) => 
 
     try {
       set({ isUpdating: true });
-      
+
       // Check if the conversation is deleted for the current user before updating
       const { data: currentUser } = await supabase.auth.getUser();
       if (!currentUser.user) return;
@@ -37,7 +37,9 @@ export const useUnreadMessagesStore = create<UnreadMessagesState>((set, get) => 
       if (!conversation) return;
 
       const isCreator = conversation.creator_id === currentUser.user.id;
-      const isDeleted = isCreator ? conversation.deleted_by_creator : conversation.deleted_by_participant;
+      const isDeleted = isCreator
+        ? conversation.deleted_by_creator
+        : conversation.deleted_by_participant;
 
       // Only update count if the conversation is not deleted for this user
       if (!isDeleted) {
@@ -63,7 +65,7 @@ export const useUnreadMessagesStore = create<UnreadMessagesState>((set, get) => 
 
     try {
       set({ isUpdating: true });
-      
+
       // Check if the conversation is deleted for the current user before incrementing
       const { data: currentUser } = await supabase.auth.getUser();
       if (!currentUser.user) return;
@@ -77,7 +79,9 @@ export const useUnreadMessagesStore = create<UnreadMessagesState>((set, get) => 
       if (!conversation) return;
 
       const isCreator = conversation.creator_id === currentUser.user.id;
-      const isDeleted = isCreator ? conversation.deleted_by_creator : conversation.deleted_by_participant;
+      const isDeleted = isCreator
+        ? conversation.deleted_by_creator
+        : conversation.deleted_by_participant;
 
       // Only increment count if the conversation is not deleted for this user
       if (!isDeleted) {
@@ -121,14 +125,16 @@ export const useUnreadMessagesStore = create<UnreadMessagesState>((set, get) => 
 
     try {
       set({ isUpdating: true });
-      
+
       const { data: currentUser } = await supabase.auth.getUser();
       if (!currentUser.user) return;
 
       // Get conversations and check deletion status
       const { data: conversations, error } = await supabase
         .from('conversations')
-        .select('id, creator_id, participant_id, deleted_by_creator, deleted_by_participant, unread_count_creator, unread_count_participant')
+        .select(
+          'id, creator_id, participant_id, deleted_by_creator, deleted_by_participant, unread_count_creator, unread_count_participant'
+        )
         .or(`creator_id.eq.${currentUser.user.id},participant_id.eq.${currentUser.user.id})`);
 
       if (error) throw error;
@@ -163,4 +169,4 @@ export const useUnreadMessagesStore = create<UnreadMessagesState>((set, get) => 
       set({ isUpdating: false });
     }
   },
-})); 
+}));

@@ -27,19 +27,18 @@ export default function BasePostForm<T extends BaseFormData>({
   onPickImage,
   onRemoveImage,
   maxImages,
-  children
+  children,
 }: BasePostFormProps<T>) {
   const theme = useTheme();
 
   return (
     <View style={[styles.container, { backgroundColor: theme.colors.background }]}>
-      <ScrollView 
-        contentContainerStyle={styles.scrollContent}
-        showsVerticalScrollIndicator={false}
-      >
+      <ScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
         <View style={styles.basicInfoSection}>
-          <Text variant="titleMedium" style={styles.sectionTitle}>Basic Information</Text>
-          
+          <Text variant="titleMedium" style={styles.sectionTitle}>
+            Basic Information
+          </Text>
+
           <TextInput
             label="Title"
             value={formState.title}
@@ -67,7 +66,7 @@ export default function BasePostForm<T extends BaseFormData>({
 
           <SegmentedButtons
             value={formState.listingType}
-            onValueChange={value => onInputChange('listingType', value)}
+            onValueChange={(value) => onInputChange('listingType', value)}
             buttons={[
               { value: 'sale', label: 'For Sale' },
               { value: 'rent', label: 'For Rent' },
@@ -116,4 +115,4 @@ const styles = StyleSheet.create({
   segmentedButton: {
     marginVertical: 8,
   },
-}); 
+});

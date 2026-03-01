@@ -1,15 +1,15 @@
-import React, { useEffect, useState, useCallback } from "react";
-import { FlatList, StyleSheet, View } from "react-native";
-import { ActivityIndicator, useTheme, Text } from "react-native-paper";
-import { MaterialCommunityIcons } from "@expo/vector-icons";
-import { router } from "expo-router";
-import { useAuthStore } from "../../../store/useAuthStore";
-import { supabase } from "../../../supabaseClient";
-import PostCard from "../../../components/posts/PostCard";
-import { Post } from "../../../types/database";
-import LoadingScreen from "../../../components/ui/LoadingScreen";
-import Header from "../../../components/layout/Header";
-import { POSTS_PER_PAGE } from "../../../constants/pagination";
+import React, { useEffect, useState, useCallback } from 'react';
+import { FlatList, StyleSheet, View } from 'react-native';
+import { ActivityIndicator, useTheme, Text } from 'react-native-paper';
+import { MaterialCommunityIcons } from '@expo/vector-icons';
+import { router } from 'expo-router';
+import { useAuthStore } from '../../../store/useAuthStore';
+import { supabase } from '../../../supabaseClient';
+import PostCard from '../../../components/posts/PostCard';
+import { Post } from '../../../types/database';
+import LoadingScreen from '../../../components/ui/LoadingScreen';
+import Header from '../../../components/layout/Header';
+import { POSTS_PER_PAGE } from '../../../constants/pagination';
 
 export default function MyPostsScreen() {
   const [userPosts, setUserPosts] = useState<Post[]>([]);
@@ -22,18 +22,20 @@ export default function MyPostsScreen() {
   const theme = useTheme();
   const { user } = useAuthStore();
 
-  const fetchUserPosts = useCallback(async (start = 0, isRefresh = false) => {
-    if (!user) return;
+  const fetchUserPosts = useCallback(
+    async (start = 0, isRefresh = false) => {
+      if (!user) return;
 
-    try {
-      if (start >= totalCount && totalCount > 0) {
-        setHasMore(false);
-        return;
-      }
+      try {
+        if (start >= totalCount && totalCount > 0) {
+          setHasMore(false);
+          return;
+        }
 
-      const { data, error, count } = await supabase
-        .from("posts")
-        .select(`
+        const { data, error, count } = await supabase
+          .from('posts')
+          .select(
+            `
           *,
           user:user_id (
             id,
@@ -44,26 +46,30 @@ export default function MyPostsScreen() {
             user_type,
             is_verified
           )
-        `, { count: 'exact' })
-        .eq("user_id", user.id)
-        .neq("status", "removed")
-        .order("created_at", { ascending: false })
-        .range(start, start + POSTS_PER_PAGE - 1);
+        `,
+            { count: 'exact' }
+          )
+          .eq('user_id', user.id)
+          .neq('status', 'removed')
+          .order('created_at', { ascending: false })
+          .range(start, start + POSTS_PER_PAGE - 1);
 
-      if (error) throw error;
+        if (error) throw error;
 
-      const total = count || 0;
-      setTotalCount(total);
+        const total = count || 0;
+        setTotalCount(total);
 
-      const hasMorePosts = start + POSTS_PER_PAGE < total;
-      setHasMore(hasMorePosts);
-      
-      setUserPosts(prevPosts => isRefresh ? (data || []) : [...prevPosts, ...(data || [])]);
-    } catch (error) {
-      console.error("Error fetching posts:", error);
-      setHasMore(false);
-    }
-  }, [user, page, userPosts.length, totalCount]);
+        const hasMorePosts = start + POSTS_PER_PAGE < total;
+        setHasMore(hasMorePosts);
+
+        setUserPosts((prevPosts) => (isRefresh ? data || [] : [...prevPosts, ...(data || [])]));
+      } catch (error) {
+        console.error('Error fetching posts:', error);
+        setHasMore(false);
+      }
+    },
+    [user, page, userPosts.length, totalCount]
+  );
 
   useEffect(() => {
     if (user) {
@@ -82,14 +88,14 @@ export default function MyPostsScreen() {
 
   const handleLoadMore = useCallback(async () => {
     if (loadingMore || !hasMore) return;
-    
+
     const nextStart = page * POSTS_PER_PAGE + POSTS_PER_PAGE;
-    
+
     if (nextStart >= totalCount) {
       setHasMore(false);
       return;
     }
-    
+
     setLoadingMore(true);
     const nextPage = page + 1;
     setPage(nextPage);
@@ -101,9 +107,9 @@ export default function MyPostsScreen() {
     try {
       const { error } = await supabase
         .from('posts')
-        .update({ 
+        .update({
           status: 'removed',
-          updated_at: new Date().toISOString()
+          updated_at: new Date().toISOString(),
         })
         .eq('id', postId);
 
@@ -113,8 +119,8 @@ export default function MyPostsScreen() {
       }
 
       // Remove the post from the local state
-      setUserPosts(prevPosts => prevPosts.filter(post => post.id !== postId));
-      setTotalCount(prev => prev - 1);
+      setUserPosts((prevPosts) => prevPosts.filter((post) => post.id !== postId));
+      setTotalCount((prev) => prev - 1);
     } catch (error) {
       console.error('Error deleting post:', error);
     }
@@ -123,10 +129,10 @@ export default function MyPostsScreen() {
   const handleUpdate = useCallback((post: Post) => {
     router.push({
       pathname: '/(tabs)/create/create-post',
-      params: { 
+      params: {
         mode: 'update',
-        post: JSON.stringify(post)
-      }
+        post: JSON.stringify(post),
+      },
     });
   }, []);
 
@@ -140,9 +146,8 @@ export default function MyPostsScreen() {
         />
         <Text
           variant="bodyLarge"
-          style={[styles.emptyText, { color: theme.colors.onSurfaceVariant }]}
-        >
-          {loading ? "Loading posts..." : "No posts yet"}
+          style={[styles.emptyText, { color: theme.colors.onSurfaceVariant }]}>
+          {loading ? 'Loading posts...' : 'No posts yet'}
         </Text>
       </View>
     ),
@@ -155,18 +160,21 @@ export default function MyPostsScreen() {
 
   // Pad userPosts to ensure consistent two-column layout
   const numColumns = 2;
-  const paddedUserPosts = userPosts.length % numColumns === 0 ? userPosts : [...userPosts, ...Array(numColumns - (userPosts.length % numColumns)).fill(null)];
+  const paddedUserPosts =
+    userPosts.length % numColumns === 0
+      ? userPosts
+      : [...userPosts, ...Array(numColumns - (userPosts.length % numColumns)).fill(null)];
 
   return (
     <View style={[styles.container, { backgroundColor: theme.colors.background }]}>
       <Header title="My Posts" />
       <FlatList
         data={paddedUserPosts}
-        renderItem={({ item }) => (
+        renderItem={({ item }) =>
           item ? (
             <View style={styles.postCardWrapper}>
-              <PostCard 
-                post={item} 
+              <PostCard
+                post={item}
                 showMenu={true}
                 onDelete={handleDelete}
                 onUpdate={handleUpdate}
@@ -176,8 +184,8 @@ export default function MyPostsScreen() {
           ) : (
             <View style={[styles.postCardWrapper, { backgroundColor: 'transparent' }]} />
           )
-        )}
-        keyExtractor={(item, index) => item ? item.id : `empty-${index}`}
+        }
+        keyExtractor={(item, index) => (item ? item.id : `empty-${index}`)}
         contentContainerStyle={styles.listContainer}
         onEndReached={handleLoadMore}
         onEndReachedThreshold={0.5}
@@ -210,17 +218,17 @@ const styles = StyleSheet.create({
   },
   emptyContainer: {
     flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
+    justifyContent: 'center',
+    alignItems: 'center',
     padding: 16,
   },
   emptyText: {
     marginTop: 8,
-    textAlign: "center",
+    textAlign: 'center',
   },
   footerLoader: {
     padding: 16,
-    alignItems: "center",
+    alignItems: 'center',
   },
   loadingMoreText: {
     marginTop: 8,
@@ -237,4 +245,4 @@ const styles = StyleSheet.create({
   postCard: {
     width: '100%',
   },
-}); 
+});

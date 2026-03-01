@@ -30,7 +30,13 @@ export default function Index() {
 
   if (isLoading) {
     return (
-      <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: theme.colors.background }}>
+      <View
+        style={{
+          flex: 1,
+          justifyContent: 'center',
+          alignItems: 'center',
+          backgroundColor: theme.colors.background,
+        }}>
         <ActivityIndicator size="large" />
       </View>
     );
@@ -41,4 +47,4 @@ export default function Index() {
   }
 
   return <Redirect href="/(auth)/login" />;
-} 
+}

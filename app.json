@@ -39,9 +39,7 @@
         {
           "icon": "./assets/images/favicon.png",
           "color": "#ffffff",
-          "sounds": [
-            "./assets/sounds/notification.mp3"
-          ],
+          "sounds": ["./assets/sounds/notification.mp3"],
           "androidMode": "default",
           "androidCollapsedTitle": "New Message",
           "iosDisplayInForeground": true

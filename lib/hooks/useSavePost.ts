@@ -11,12 +11,12 @@ interface UseSavePostOptions {
   showSuccessAlerts?: boolean;
 }
 
-export const useSavePost = ({ 
-  postId, 
-  userId, 
-  showAuthDialog, 
-  onUnsave, 
-  showSuccessAlerts = false 
+export const useSavePost = ({
+  postId,
+  userId,
+  showAuthDialog,
+  onUnsave,
+  showSuccessAlerts = false,
 }: UseSavePostOptions) => {
   const { user } = useAuthStore();
   const [isSaved, setIsSaved] = useState(false);
@@ -31,7 +31,7 @@ export const useSavePost = ({
 
   const checkSavedStatus = async () => {
     if (!user || !postId) return;
-    
+
     try {
       const saved = await savedPostsService.isPostSaved(postId, user.id);
       setIsSaved(saved);
@@ -92,6 +92,6 @@ export const useSavePost = ({
     isSaved,
     saving,
     handleSavePost,
-    checkSavedStatus
+    checkSavedStatus,
   };
-}; 
+};

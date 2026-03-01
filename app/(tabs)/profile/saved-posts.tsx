@@ -25,7 +25,7 @@ export default function SavedPostsScreen() {
 
   const fetchSavedPosts = async () => {
     if (!user) return;
-    
+
     try {
       setLoading(true);
       const posts = await savedPostsService.getSavedPosts(user.id);
@@ -45,14 +45,11 @@ export default function SavedPostsScreen() {
 
   const handlePostUnsave = (postId: string) => {
     // Remove the unsaved post from the local state
-    setSavedPosts(prevPosts => prevPosts.filter(post => post.id !== postId));
+    setSavedPosts((prevPosts) => prevPosts.filter((post) => post.id !== postId));
   };
 
   const renderPost = ({ item }: { item: Post }) => (
-    <PostCard 
-      post={item} 
-      onUnsave={handlePostUnsave}
-    />
+    <PostCard post={item} onUnsave={handlePostUnsave} />
   );
 
   if (!user) {
@@ -65,16 +62,12 @@ export default function SavedPostsScreen() {
             size={64}
             color={theme.colors.onSurfaceVariant}
           />
-          <Text
-            variant="headlineSmall"
-            style={[styles.title, { color: theme.colors.onSurface }]}
-          >
+          <Text variant="headlineSmall" style={[styles.title, { color: theme.colors.onSurface }]}>
             Login Required
           </Text>
           <Text
             variant="bodyLarge"
-            style={[styles.subtitle, { color: theme.colors.onSurfaceVariant }]}
-          >
+            style={[styles.subtitle, { color: theme.colors.onSurfaceVariant }]}>
             Please login to view your saved posts.
           </Text>
         </View>
@@ -103,16 +96,12 @@ export default function SavedPostsScreen() {
             size={64}
             color={theme.colors.onSurfaceVariant}
           />
-          <Text
-            variant="headlineSmall"
-            style={[styles.title, { color: theme.colors.onSurface }]}
-          >
+          <Text variant="headlineSmall" style={[styles.title, { color: theme.colors.onSurface }]}>
             No Saved Posts
           </Text>
           <Text
             variant="bodyLarge"
-            style={[styles.subtitle, { color: theme.colors.onSurfaceVariant }]}
-          >
+            style={[styles.subtitle, { color: theme.colors.onSurfaceVariant }]}>
             Start saving posts by tapping the bookmark icon on any post.
           </Text>
         </View>
@@ -122,9 +111,7 @@ export default function SavedPostsScreen() {
           renderItem={renderPost}
           keyExtractor={(item) => item.id}
           contentContainerStyle={styles.listContainer}
-          refreshControl={
-            <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
-          }
+          refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} />}
         />
       )}
     </View>
@@ -157,4 +144,4 @@ const styles = StyleSheet.create({
   listContainer: {
     padding: 16,
   },
-}); 
+});

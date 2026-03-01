@@ -26,17 +26,25 @@ export default function Register() {
     return (
       <View style={[styles.container, { backgroundColor: theme.colors.background }]}>
         <View style={styles.successContainer}>
-          <Text variant="headlineMedium" style={[styles.successTitle, { color: theme.colors.primary }]}>
+          <Text
+            variant="headlineMedium"
+            style={[styles.successTitle, { color: theme.colors.primary }]}>
             Verify Your Email!
           </Text>
           <Text variant="bodyLarge" style={[styles.emailText, { color: theme.colors.primary }]}>
             {email}
           </Text>
-          <Text variant="bodyMedium" style={[styles.successInstructions, { color: theme.colors.onSurfaceVariant }]}>
-            Please check your email and click the verification link to activate your account. The link will expire in 24 hours.
+          <Text
+            variant="bodyMedium"
+            style={[styles.successInstructions, { color: theme.colors.onSurfaceVariant }]}>
+            Please check your email and click the verification link to activate your account. The
+            link will expire in 24 hours.
           </Text>
 
-          <Button mode="contained" onPress={() => router.replace('/(auth)/login')} style={styles.backButton}>
+          <Button
+            mode="contained"
+            onPress={() => router.replace('/(auth)/login')}
+            style={styles.backButton}>
             Go to Login
           </Button>
 
@@ -49,8 +57,7 @@ export default function Register() {
               setEmail('');
               setPassword('');
             }}
-            style={styles.resendButton}
-          >
+            style={styles.resendButton}>
             Create Another Account
           </Button>
         </View>
@@ -94,9 +101,9 @@ export default function Register() {
   const onCaptchaVerify = async (recaptchaToken: string) => {
     try {
       setError('');
-      
+
       const result = await signUp(email, password, username, recaptchaToken, displayName);
-      
+
       if (result.success) {
         setSuccess(true);
       }
@@ -108,14 +115,10 @@ export default function Register() {
 
   return (
     <View style={[styles.container, { backgroundColor: theme.colors.background }]}>
-      <KeyboardAvoidingView 
+      <KeyboardAvoidingView
         behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-        style={{ flex: 1 }}
-      >
-        <ScrollView 
-          contentContainerStyle={{ flexGrow: 1 }}
-          keyboardShouldPersistTaps="handled"
-        >
+        style={{ flex: 1 }}>
+        <ScrollView contentContainerStyle={{ flexGrow: 1 }} keyboardShouldPersistTaps="handled">
           <View style={{ padding: 20, flex: 1, justifyContent: 'center' }}>
             <Text variant="headlineMedium" style={{ marginBottom: 24, textAlign: 'center' }}>
               Create Account
@@ -145,7 +148,7 @@ export default function Register() {
               style={{ marginBottom: 16 }}
               disabled={loading}
             />
-            
+
             <TextInput
               mode="outlined"
               label="Email"
@@ -178,19 +181,17 @@ export default function Register() {
               onPress={handleRegister}
               style={{ marginBottom: 16 }}
               loading={loading}
-              disabled={loading}
-            >
+              disabled={loading}>
               Register
             </Button>
 
             <View style={{ flexDirection: 'row', justifyContent: 'center', alignItems: 'center' }}>
               <Text variant="bodyMedium">Already have an account? </Text>
-              <Button 
-                mode="text" 
-                compact 
+              <Button
+                mode="text"
+                compact
                 onPress={() => router.replace('/(auth)/login')}
-                disabled={loading}
-              >
+                disabled={loading}>
                 Login
               </Button>
             </View>
@@ -246,4 +247,4 @@ const styles = StyleSheet.create({
   resendButton: {
     marginTop: 8,
   },
-}); 
+});
